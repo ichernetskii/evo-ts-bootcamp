@@ -112,7 +112,8 @@ $animationWithDelay: 0.15s 0.06s ease-in;
   }
 
   &__description {
-
+    height: 65px;
+    overflow: hidden;
   }
 
   &__likes {
