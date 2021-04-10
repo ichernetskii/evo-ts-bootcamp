@@ -20,7 +20,7 @@ interface IState {
   elemsDelayError: boolean
 }
 
-class App extends React.Component {
+class App extends React.Component<{}, IState> {
   state: IState = {
     elements: Array(20).fill(0),
     delay: 50,
@@ -44,23 +44,27 @@ class App extends React.Component {
   }
 
   private newSetHandler = () => {
-    this.setState({ status: Status.notStarted });
+    this.setState({ ...this.state, status: Status.notStarted });
     this.setRandomElements();
+  }
+
+  private setStatus(s: Status) {
+    this.setState({ ...this.state, status: s });
   }
 
   private sortHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     switch (this.state.status) {
       case Status.started:
-        this.setState({ status: Status.paused });
+        this.setStatus(Status.paused)
         return;
       case Status.paused:
-        this.setState({ status: Status.started });
+        this.setStatus(Status.started)
         return;
       case Status.solved:
-        this.setState({ status: Status.solved });
+        this.setStatus(Status.solved)
         return;
       default:
-        this.setState({ status: Status.started });
+        this.setStatus(Status.started)
     }
 
     for (let lastIndex: number = this.state.elements.length - 1; lastIndex >= 1 ; lastIndex-- ) {
@@ -73,9 +77,9 @@ class App extends React.Component {
           this.setElements(els);
           changed = true;
         }
-  
+
         await delay(this.state.delay);
-        
+
         if (this.state.status === Status.notStarted) {
           this.setRandomElements();
           return;
@@ -85,26 +89,26 @@ class App extends React.Component {
       }
 
       if (!changed) {
-        this.setState({ status: Status.solved })
+        this.setStatus(Status.solved)
         return;
       }
     }
 
-    this.setState({ status: Status.solved })
+    this.setStatus(Status.solved)
   }
 
   private changeCountHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const val: number = Number.parseInt(event.target.value);
       if (!isNaN(val) && val > 1 && val <= 100) {
         this.setRandomElements(val);
-      } else this.setState({ elemsCountError: true });
+      } else this.setState({ ...this.state,  elemsCountError: true });
   }
 
   private changeDelayHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const val: number = Number.parseInt(event.target.value);
       if (!isNaN(val) && val > 1 && val <= 5000) {
-        this.setState({ delay: val, elemsDelayError: false })
-      } else this.setState({ elemsDelayError: true });
+        this.setState({ ...this.state,  delay: val, elemsDelayError: false })
+      } else this.setState({ ...this.state,  elemsDelayError: true });
   }
 
   componentDidMount(): void {
