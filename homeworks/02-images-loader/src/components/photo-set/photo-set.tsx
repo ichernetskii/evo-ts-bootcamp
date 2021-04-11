@@ -35,7 +35,7 @@ class PhotoSet extends React.Component<{}, IPhotoSetState> {
     private loadPhotos(query: string): void {
         api.search
             .getPhotos({ query, perPage: 29 })
-            .then(result => {
+            .then((result) => {
                 if (result.type === "success")
                     this.setState({ ...this.state, photos: result?.response?.results as unknown as Photo[] })
             })
@@ -89,7 +89,9 @@ class PhotoSet extends React.Component<{}, IPhotoSetState> {
                             </div>
                             <div className={s.image__about}>
                                 <div className={s.image__description}>
-                                    { photo.description || `Photo by ${photo.user.name}` }
+                                    <div className={s.image__descriptionText}>
+                                        { photo.description || `Photo by ${photo.user.name}` }
+                                    </div>
                                 </div>
                                 <div className={s.image__likes}>
                                     <svg className={s.image__heart} viewBox="0 0 100 92">

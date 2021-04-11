@@ -114,9 +114,14 @@ $animationWithDelay: 0.15s 0.06s ease-in;
   &__description {
     height: 65px;
     overflow: hidden;
+    display: grid;
+    align-items: center;
+    padding-right: 10px;
+  }
+
+  &__descriptionText {
     display: flex;
     align-items: flex-start;
-    padding-right: 10px;
   }
 
   &__likes {
