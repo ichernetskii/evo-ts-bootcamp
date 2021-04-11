@@ -25,19 +25,19 @@ interface IPhotoSetState {
     photos: Photo[]
 }
 
-class PhotoSet extends React.Component<{}, unknown> {
+class PhotoSet extends React.Component<{}, IPhotoSetState> {
     state: IPhotoSetState = {
         photos: []
     }
 
     query: string = "cat";
 
-    private loadPhotos(query: string):void {
+    private loadPhotos(query: string): void {
         api.search
             .getPhotos({ query, perPage: 29 })
             .then(result => {
                 if (result.type === "success")
-                    this.setState({ ...this.state, photos: result?.response?.results })
+                    this.setState({ ...this.state, photos: result?.response?.results as unknown as Photo[] })
             })
             .catch(() => {
                 console.error("something went wrong!");
