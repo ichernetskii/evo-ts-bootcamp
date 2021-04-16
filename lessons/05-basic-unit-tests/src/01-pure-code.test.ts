@@ -38,12 +38,20 @@ describe("01-pure-code", () => {
    * Exercise 1
    */
   describe("isPrime", () => {
-    it.todo("asserts 19 to be prime")
+    it("asserts 19 to be prime", () => {
+      expect(isPrime(19)).toBe(true)
+    })
 
-    it.todo("asserts 25 not to be prime")
+    it("asserts 25 not to be prime", () => {
+      expect(isPrime(25)).toBe(false)
+    })
 
-    it.todo("throws an error for NaN argument")
+    it("throws an error for NaN argument", () => {
+      expect(() => isPrime(NaN)).toThrow()
+    })
 
-    it.todo("throws an error for infinite argument")
+    it("throws an error for infinite argument", () => {
+      expect(() => isPrime(Infinity)).toThrow()
+    })
   })
 })

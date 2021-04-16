@@ -1,6 +1,8 @@
 import React from "react";
 import s from "./photo-set.module.scss";
 import { createApi } from "unsplash-js";
+import {ApiResponse} from "unsplash-js/dist/helpers/response";
+import {Photos} from "unsplash-js/dist/methods/search/types/response";
 
 type Photo = {
     alt_description: string,
@@ -22,20 +24,20 @@ const api = createApi({
 });
 
 interface IPhotoSetState {
-    photos: Photo[]
+    photos: Photo[],
+    query: string
 }
 
 class PhotoSet extends React.Component<{}, IPhotoSetState> {
     state: IPhotoSetState = {
-        photos: []
+        photos: [],
+        query: "cat"
     }
-
-    query: string = "cat";
 
     private loadPhotos(query: string): void {
         api.search
             .getPhotos({ query, perPage: 29 })
-            .then((result) => {
+            .then((result: ApiResponse<Photos>) => {
                 if (result.type === "success")
                     this.setState({ ...this.state, photos: result?.response?.results as unknown as Photo[] })
             })
@@ -45,20 +47,20 @@ class PhotoSet extends React.Component<{}, IPhotoSetState> {
     }
 
     componentDidMount(): void {
-        this.loadPhotos(this.query);
+        this.loadPhotos(this.state.query);
     }
 
     private onQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        this.query = event.target.value;
+        this.setState({ ...this.state,  query: event.target.value });
     }
 
-    private onQueryEnter = (event: any) => {
-        if (event.code === "Enter")
-            if (event.target.value) this.loadPhotos(event.target.value);
+    private onQueryEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        const query: string = this.state.query;
+        if (event.code === "Enter" && query) this.loadPhotos(query);
     }
 
     private onFindClick = () => {
-        if (this.query) this.loadPhotos(this.query);
+        if (this.state.query) this.loadPhotos(this.state.query);
     }
 
     render() {
@@ -69,7 +71,8 @@ class PhotoSet extends React.Component<{}, IPhotoSetState> {
                         <input
                             className={s.query__input}
                             type="edit"
-                            defaultValue={this.query}
+                            value={this.state.query}
+                            // defaultValue={this.query}
                             onChange={this.onQueryChange}
                             onKeyDown={this.onQueryEnter}
                         />

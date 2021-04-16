@@ -4,7 +4,7 @@ afterEach(() => {
   jest.restoreAllMocks();
 });
 
-describe.skip("02-mocking", () => {
+describe("02-mocking", () => {
   /**
    * A stub is an object that resembles a real object with the minimum number of methods needed for a test.
    * A stub is referred to as the lightest, and the most static version of the test doubles.
@@ -40,6 +40,7 @@ describe.skip("02-mocking", () => {
 
     expect(useKV(spy)).toBe(3)
     expect(f).toHaveBeenCalledWith(2)
+    expect(f).toHaveBeenCalledTimes(1)
   });
 
   /**
@@ -61,9 +62,38 @@ describe.skip("02-mocking", () => {
   /**
    * Exercise 1
    */
-  it.todo("asserts useKV(kv) is calling put correctly using a stub")
+  it("asserts useKV(kv) is calling put correctly using a stub", () => {
+    const data: { [key: number]: number } = {};
+    const stub: KeyValueStore = {
+      put: (key, value) => data[key] = value,
+      get: () => 0
+    }
+    useKV(stub)
+    expect(data).toEqual({
+      0: 1, 1: 2, 2: 3
+    })
+  })
 
-  it.todo("asserts useKV(kv) is calling put correctly using a spy")
+  it("asserts useKV(kv) is calling put correctly using a spy", () => {
+    const original = keyValueStore();
+    const spy: KeyValueStore = {
+      ...original,
+      put: jest.fn((k: number, v: number) => original.put(k, v))
+    }
+    useKV(spy);
+    expect(spy.put).toHaveBeenCalledTimes(3);
+    expect(spy.put).toHaveBeenNthCalledWith(1, 0, 1);
+    expect(spy.put).toHaveBeenNthCalledWith(2, 1, 2);
+    expect(spy.put).toHaveBeenNthCalledWith(3, 2, 3);
+  })
 
-  it.todo("asserts useKV(kv) is calling put correctly using a fake")
+  it("asserts useKV(kv) is calling put correctly using a fake", () => {
+    const data: number[] = [];
+    const fake = {
+      get: (n: number): number => data[n],
+      put: (k: number, v: number): void => { data[k] = v }
+    }
+    expect(useKV(fake)).toEqual(3);
+    expect(data).toEqual([1, 2, 3]);
+  })
 })
