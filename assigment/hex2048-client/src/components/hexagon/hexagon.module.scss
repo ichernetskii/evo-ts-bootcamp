@@ -1,0 +1,76 @@
+@keyframes appear {
+  0% {
+    transform: scale(1);
+  }
+
+  20% {
+    transform: scale(1.2);
+  }
+
+  40% {
+    transform: scale(0.85);
+  }
+
+  60% {
+    transform: scale(1.1);
+  }
+
+  80% {
+    transform: scale(0.95);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes add {
+  0% {
+    fill: #F00;
+    font-size: 1.6em;
+  }
+
+  100% {
+    fill: #000;
+    font-size: 1em;
+  }
+}
+
+@keyframes add_text-indent {
+  0% {
+    transform: translateY(0.2em);
+  }
+
+  100% {
+    transform: none;
+  }
+}
+
+.hexagon {
+  position: absolute;
+
+  &_appeared {
+    z-index: 1;
+    animation: appear 1s 1;
+  }
+
+  &_added {
+    .hexagon-text {
+      animation: add_text-indent 1s 1;
+
+      & tspan {
+        animation: add 1s 1;
+      }
+    }
+  }
+}
+
+.hexagon-polygon {
+  fill: #D5D5D5;
+  stroke: #333;
+}
+
+.hexagon-text {
+  text-anchor: middle;
+  font-size: 2em;
+}
