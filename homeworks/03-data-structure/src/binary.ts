@@ -33,7 +33,7 @@ export class BinaryTree<T = number> implements IBinaryTree<T> {
         return this;
     }
 
-    protected fillColumns(initialColumn: number): this {
+    private fillColumns(initialColumn: number): this {
         this.tree.column = initialColumn;
         if (this.tree.left) new BinaryTree(this.tree.left).fillColumns(initialColumn - 1);
         if (this.tree.right) new BinaryTree(this.tree.right).fillColumns(initialColumn + 1);
