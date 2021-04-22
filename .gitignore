@@ -1,2 +1,3 @@
 **/node_modules/
 /homeworks/**/coverage/
+/homeworks/**/build/
