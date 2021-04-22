@@ -1,15 +1,13 @@
 import React from 'react';
 import Field from '../field/field';
 import {randomArray, delay} from "../../assets/utils";
-
-// styles
 import './app.scss';
 
 enum Status {
-  notStarted = "not started",
-  started = "started",
-  paused = "paused",
-  solved = "solved"
+  NotStarted = "not started",
+  Started = "started",
+  Paused = "paused",
+  Solved = "solved"
 }
 
 interface IState {
@@ -22,9 +20,9 @@ interface IState {
 
 class App extends React.Component<{}, IState> {
   state: IState = {
-    elements: Array(20).fill(0),
+    elements: randomArray(20),
     delay: 50,
-    status: Status.notStarted,
+    status: Status.NotStarted,
     elemsCountError: false,
     elemsDelayError: false
   };
@@ -38,33 +36,33 @@ class App extends React.Component<{}, IState> {
       ...state,
       elemsCountError: false,
       elemsDelayError: false,
-      status: Status.notStarted,
+      status: Status.NotStarted,
       elements: randomArray(count)
     }));
   }
 
   private newSetHandler = () => {
-    this.setState({ ...this.state, status: Status.notStarted });
+    this.setState({ ...this.state, status: Status.NotStarted });
     this.setRandomElements();
   }
 
-  private setStatus(s: Status) {
-    this.setState({ ...this.state, status: s });
+  private setStatus(status: Status) {
+    this.setState({ ...this.state, status });
   }
 
-  private sortHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
+  private sortHandler = async () => {
     switch (this.state.status) {
-      case Status.started:
-        this.setStatus(Status.paused)
+      case Status.Started:
+        this.setStatus(Status.Paused)
         return;
-      case Status.paused:
-        this.setStatus(Status.started)
+      case Status.Paused:
+        this.setStatus(Status.Started)
         return;
-      case Status.solved:
-        this.setStatus(Status.solved)
+      case Status.Solved:
+        this.setStatus(Status.Solved)
         return;
       default:
-        this.setStatus(Status.started)
+        this.setStatus(Status.Started)
     }
 
     for (let lastIndex: number = this.state.elements.length - 1; lastIndex >= 1 ; lastIndex-- ) {
@@ -80,24 +78,24 @@ class App extends React.Component<{}, IState> {
 
         await delay(this.state.delay);
 
-        if (this.state.status === Status.notStarted) {
+        if (this.state.status === Status.NotStarted) {
           this.setRandomElements();
           return;
         }
 
-        if (this.state.status === Status.paused) i--;
+        if (this.state.status === Status.Paused) i--;
       }
 
       if (!changed) {
-        this.setStatus(Status.solved)
+        this.setStatus(Status.Solved)
         return;
       }
     }
 
-    this.setStatus(Status.solved)
+    this.setStatus(Status.Solved)
   }
 
-  private changeCountHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+  private changeCountHandler: React.ChangeEventHandler<HTMLInputElement> = event => {
     const val: number = Number.parseInt(event.target.value);
       if (!isNaN(val) && val > 1 && val <= 100) {
         this.setRandomElements(val);
@@ -109,10 +107,6 @@ class App extends React.Component<{}, IState> {
       if (!isNaN(val) && val > 1 && val <= 5000) {
         this.setState({ ...this.state,  delay: val, elemsDelayError: false })
       } else this.setState({ ...this.state,  elemsDelayError: true });
-  }
-
-  componentDidMount(): void {
-    this.setRandomElements();
   }
 
   componentDidUpdate(prevProps: any, prevState: IState): void {
@@ -129,8 +123,8 @@ class App extends React.Component<{}, IState> {
           <div className="app__controls">
             <div className="app__buttons">
               <button onClick={(this.newSetHandler)}>New set</button>
-              <button onClick={(this.sortHandler)} disabled={this.state.status === Status.solved}>
-                { this.state.status === Status.started ? "Pause" : "Start" }
+              <button onClick={(this.sortHandler)} disabled={this.state.status === Status.Solved}>
+                { this.state.status === Status.Started ? "Pause" : "Start" }
               </button>
             </div>
             <span className="app__status" >{ this.state.status }</span>
