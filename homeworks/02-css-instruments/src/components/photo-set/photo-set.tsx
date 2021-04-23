@@ -1,8 +1,16 @@
 import React from "react";
 import s from "./photo-set.module.scss";
-import { createApi } from "unsplash-js";
+import {createApi} from "unsplash-js";
 import {ApiResponse} from "unsplash-js/dist/helpers/response";
 import {Photos} from "unsplash-js/dist/methods/search/types/response";
+
+interface IPhotoSetProps {
+    query: string
+}
+
+interface IPhotoSetState {
+    photos: Photo[]
+}
 
 type Photo = {
     alt_description: string,
@@ -23,15 +31,9 @@ const api = createApi({
     accessKey: "aUZkPDAweOjJUDp-oJfQXoMpcFZ_HRigipkAbxt3ZQ8"
 });
 
-interface IPhotoSetState {
-    photos: Photo[],
-    query: string
-}
-
-class PhotoSet extends React.Component<{}, IPhotoSetState> {
+export class PhotoSet extends React.Component<IPhotoSetProps, IPhotoSetState> {
     state: IPhotoSetState = {
-        photos: [],
-        query: "cat"
+        photos: []
     }
 
     private loadPhotos(query: string): void {
@@ -47,38 +49,16 @@ class PhotoSet extends React.Component<{}, IPhotoSetState> {
     }
 
     componentDidMount(): void {
-        this.loadPhotos(this.state.query);
+        this.loadPhotos(this.props.query);
     }
 
-    private onQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        this.setState({ ...this.state,  query: event.target.value });
-    }
-
-    private onQueryEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        const query: string = this.state.query;
-        if (event.code === "Enter" && query) this.loadPhotos(query);
-    }
-
-    private onFindClick = () => {
-        if (this.state.query) this.loadPhotos(this.state.query);
+    componentDidUpdate(prevProps: Readonly<IPhotoSetProps>, prevState:Readonly<IPhotoSetState>): void {
+        if (prevProps.query !== this.props.query) this.loadPhotos(this.props.query);
     }
 
     render() {
         return (
-            <div className={s.root}>
-                <div className={s.query__wrapper}>
-                    <div className={s.query}>
-                        <input
-                            className={s.query__input}
-                            type="edit"
-                            value={this.state.query}
-                            // defaultValue={this.query}
-                            onChange={this.onQueryChange}
-                            onKeyDown={this.onQueryEnter}
-                        />
-                        <button className={s.query__button} onClick={this.onFindClick}>Find 🔍</button>
-                    </div>
-                </div>
+            <>
                 {
                     this.state.photos.map(photo => (
                         <a className={s.image} key={photo.id} href={photo.urls.regular} target="_blank" rel="noreferrer">
@@ -107,7 +87,7 @@ class PhotoSet extends React.Component<{}, IPhotoSetState> {
                     ))
                 }
                 { (!this.state.photos.length) && (<div className={s.notFound}>Not found</div>) }
-            </div>
+            </>
         )
     }
 }

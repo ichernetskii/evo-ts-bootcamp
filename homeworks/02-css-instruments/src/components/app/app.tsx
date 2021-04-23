@@ -1,12 +1,12 @@
 import React from 'react';
 import './app.css';
-import PhotoSet from "../photo-set/photo-set";
+import PhotoLoader from "../photo-loader/photo-loader";
 
 class App extends React.Component<{}, {}> {
   render() {
     return (
         <div className="app">
-            { <PhotoSet /> }
+            { <PhotoLoader /> }
         </div>
     )
   }
