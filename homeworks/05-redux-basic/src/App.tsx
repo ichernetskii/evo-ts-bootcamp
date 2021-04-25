@@ -40,7 +40,7 @@ const reducer: Reducer<IState, IAction> = (state = initialState, action) => {
 function App() {
     const ref = useRef<HTMLDivElement>(null);
 
-    const store: Store<IState, IAction> = createStore(reducer)
+    const store: Store<IState, IAction> = createStore(reducer, (window as any).__REDUX_DEVTOOLS_EXTENSION__ && (window as any).__REDUX_DEVTOOLS_EXTENSION__());
     store.subscribe(() => {
         ref.current!.textContent = store.getState().balance.toString();
     });
