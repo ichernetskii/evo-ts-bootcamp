@@ -1,0 +1,103 @@
+$animationWithDelay: 0.15s 0.06s ease-in;
+
+.image {
+  position: relative;
+  height: 300px;
+  flex-grow: 1;
+  display: flex;
+  padding: 0 10px 10px 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  transition: transform 0.15s 0s ease-in;
+  cursor: pointer;
+
+  &__content {
+    display: block;
+    height: 100%;
+    max-width: 100%;
+    flex-grow: 1;
+    object-fit: cover;
+    box-sizing: border-box;
+  }
+
+  &__size {
+    position: absolute;
+    top: calc(-0.8em - 10px);
+    right: 10px;
+    height: 0.8em;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 5px;
+    color: #FFF;
+    transition: top $animationWithDelay;
+    font-size: 0.8em;
+    line-height: 0.8em;
+  }
+
+  &__about {
+    position: absolute;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    left: 0;
+    right: 10px;
+    bottom: -60px;
+    height: 50px;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    color: #FFF;
+    opacity: 0;
+    transition: bottom $animationWithDelay,
+    opacity $animationWithDelay;
+  }
+
+  &__description {
+    height: 65px;
+    overflow: hidden;
+    display: grid;
+    align-items: center;
+    padding-right: 10px;
+  }
+
+  &__descriptionText {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  &__likes {
+    display: flex;
+  }
+
+  &__heart {
+    height: 15px;
+    margin-right: 5px;
+    fill: #F00;
+  }
+
+  &__likesCount {
+    height: 15px;
+    line-height: 12px;
+  }
+
+  &:hover {
+    transition: transform $animationWithDelay;
+    transform: scale(1.1);
+    z-index: 1;
+
+    .image__size {
+      top: 0;
+    }
+
+    .image__about {
+      top: auto;
+      bottom: 10px;
+      opacity: 1;
+    }
+  }
+}
+
+.notFound {
+  width: 100%;
+  padding: 40px;
+  text-align: center;
+  font-weight: bold;
+}
