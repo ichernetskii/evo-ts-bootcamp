@@ -1,4 +1,4 @@
-import {BinarySearchTree, BinaryTree, Errors, IBinarySearchTree, IBinaryTree, ITreeNode, TraverseType} from "./binary";
+import {BinarySearchTree, BinaryTree, IBinarySearchTree, IBinaryTree, ITreeNode, TraverseType} from "./binary";
 
 describe("All tests", () => {
     describe("BinaryTree", () => {
@@ -55,31 +55,31 @@ describe("All tests", () => {
         it("BinaryTree: with one element", () => {
             let node1: ITreeNode<number> = { value: 42 };
             let tree1: IBinaryTree<number> = new BinaryTree<number>(node1);
-            expect(tree1.traverse(TraverseType.BFS)).toEqual([42]);
-            expect(tree1.traverse(TraverseType.DFS_POSTORDER)).toEqual([42]);
-            expect(tree1.traverse(TraverseType.DFS_PREORDER)).toEqual([42]);
-            expect(tree1.traverse(TraverseType.DFS_INORDER)).toEqual([42]);
+            expect(tree1.traverse(TraverseType.Bfs)).toEqual([42]);
+            expect(tree1.traverse(TraverseType.DfsPostOrder)).toEqual([42]);
+            expect(tree1.traverse(TraverseType.DfsPreorder)).toEqual([42]);
+            expect(tree1.traverse(TraverseType.DfsInorder)).toEqual([42]);
 
             let node2: ITreeNode<string> = { value: "forty two" };
             let tree2: IBinaryTree<string> = new BinaryTree<string>(node2);
-            expect(tree2.traverse(TraverseType.BFS)).toEqual(["forty two"]);
-            expect(tree2.traverse(TraverseType.DFS_POSTORDER)).toEqual(["forty two"]);
-            expect(tree2.traverse(TraverseType.DFS_PREORDER)).toEqual(["forty two"]);
-            expect(tree2.traverse(TraverseType.DFS_INORDER)).toEqual(["forty two"]);
+            expect(tree2.traverse(TraverseType.Bfs)).toEqual(["forty two"]);
+            expect(tree2.traverse(TraverseType.DfsPostOrder)).toEqual(["forty two"]);
+            expect(tree2.traverse(TraverseType.DfsPreorder)).toEqual(["forty two"]);
+            expect(tree2.traverse(TraverseType.DfsInorder)).toEqual(["forty two"]);
         });
 
         it("BinaryTree<number> traverse", () => {
-            expect(treeNum.traverse(TraverseType.DFS_PREORDER)).toEqual([1, 2, 4, 5, 7, 8, 3, 6, 9]);
-            expect(treeNum.traverse(TraverseType.DFS_INORDER)).toEqual([4, 2, 7, 5, 8, 1, 3, 9, 6]);
-            expect(treeNum.traverse(TraverseType.DFS_POSTORDER)).toEqual([4, 7, 8, 5, 2, 9, 6, 3, 1]);
-            expect(treeNum.traverse(TraverseType.BFS)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+            expect(treeNum.traverse(TraverseType.DfsPreorder)).toEqual([1, 2, 4, 5, 7, 8, 3, 6, 9]);
+            expect(treeNum.traverse(TraverseType.DfsInorder)).toEqual([4, 2, 7, 5, 8, 1, 3, 9, 6]);
+            expect(treeNum.traverse(TraverseType.DfsPostOrder)).toEqual([4, 7, 8, 5, 2, 9, 6, 3, 1]);
+            expect(treeNum.traverse(TraverseType.Bfs)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
         });
 
         it("BinaryTree<string> traverse", () => {
-            expect(treeStr.traverse(TraverseType.DFS_PREORDER)).toEqual(["1", "2", "4", "5", "77", "08", "3", "6", "9"]);
-            expect(treeStr.traverse(TraverseType.DFS_INORDER)).toEqual(["4", "2", "77", "5", "08", "1", "3", "9", "6"]);
-            expect(treeStr.traverse(TraverseType.DFS_POSTORDER)).toEqual(["4", "77", "08", "5", "2", "9", "6", "3", "1"]);
-            expect(treeStr.traverse(TraverseType.BFS)).toEqual(["1", "2", "3", "4", "5", "6", "77", "08", "9"]);
+            expect(treeStr.traverse(TraverseType.DfsPreorder)).toEqual(["1", "2", "4", "5", "77", "08", "3", "6", "9"]);
+            expect(treeStr.traverse(TraverseType.DfsInorder)).toEqual(["4", "2", "77", "5", "08", "1", "3", "9", "6"]);
+            expect(treeStr.traverse(TraverseType.DfsPostOrder)).toEqual(["4", "77", "08", "5", "2", "9", "6", "3", "1"]);
+            expect(treeStr.traverse(TraverseType.Bfs)).toEqual(["1", "2", "3", "4", "5", "6", "77", "08", "9"]);
         });
 
         it("BinaryTree: unknown traverse type", () => {
@@ -99,7 +99,7 @@ describe("All tests", () => {
             const tree: IBinaryTree<number> = new BinaryTree(node);
             expect(tree.setTree(
                 { value: 142, left: { value: 143 }, right: { value: 144 } }
-            ).traverse(TraverseType.BFS)).toEqual([142, 143, 144]);
+            ).traverse(TraverseType.Bfs)).toEqual([142, 143, 144]);
         });
     });
 
@@ -141,5 +141,32 @@ describe("All tests", () => {
             expect(searchTree.has(0)).toEqual(false);
             expect(searchTree.has(-1)).toEqual(false);
         })
+
+        it("BinarySearchTree<number> traverse", () => {
+            expect(searchTree.traverse(TraverseType.DfsPreorder)).toEqual([1, 2, 4, 5, 7, 8, 3, 6, 9]);
+            expect(searchTree.traverse(TraverseType.DfsInorder)).toEqual([4, 2, 7, 5, 8, 1, 3, 9, 6]);
+            expect(searchTree.traverse(TraverseType.DfsPostOrder)).toEqual([4, 7, 8, 5, 2, 9, 6, 3, 1]);
+            expect(searchTree.traverse(TraverseType.Bfs)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        });
+
+        it("BinarySearchTree: unknown traverse type", () => {
+            expect(() => searchTree.traverse("__UNKNOWN__" as TraverseType)).toThrow();
+        });
+
+        it("BinarySearchTree.getColumn()", () => {
+            expect(searchTree.getColumn(0).sort()).toEqual([1, 5].sort());
+            expect(searchTree.getColumn(1).sort()).toEqual([3, 8, 9].sort());
+            expect(searchTree.getColumn(2).sort()).toEqual([6].sort());
+            expect(searchTree.getColumn(-1).sort()).toEqual([2, 7].sort());
+            expect(searchTree.getColumn(-2).sort()).toEqual([4].sort());
+        });
+
+        it("BinarySearchTree.setTree()", () => {
+            const node: ITreeNode<number> = { value: 42 };
+            const tree: IBinarySearchTree = new BinarySearchTree(node);
+            expect(tree.setTree(
+                { value: 142, left: { value: 143 }, right: { value: 144 } }
+            ).traverse(TraverseType.Bfs)).toEqual([142, 143, 144]);
+        });
     });
 })

@@ -1,19 +1,16 @@
-export enum Errors {
-    UNEXPECTED_ARG = "Unexpected argument"
-}
+import {Errors} from "./utils/errors";
 
 export enum TraverseType {
-    BFS = "BFS",
-    DFS_INORDER = "DFS_INORDER",
-    DFS_PREORDER = "DFS_PREORDER",
-    DFS_POSTORDER = "DFS_POSTORDER"
+    Bfs = "Bfs",
+    DfsInorder = "DfsInorder",
+    DfsPreorder = "DfsPreorder",
+    DfsPostOrder = "DfsPostOrder"
 }
 
 export interface ITreeNode<T = number> {
     value: T;
     left?: ITreeNode<T>;
     right?: ITreeNode<T>;
-    column?: number;
 }
 
 export interface IBinaryTree<T = number> {
@@ -33,29 +30,31 @@ export class BinaryTree<T = number> implements IBinaryTree<T> {
         return this;
     }
 
-    private fillColumns(initialColumn: number): this {
-        this.tree.column = initialColumn;
-        if (this.tree.left) new BinaryTree(this.tree.left).fillColumns(initialColumn - 1);
-        if (this.tree.right) new BinaryTree(this.tree.right).fillColumns(initialColumn + 1);
-        return this;
-    }
-
     public getColumn(columnOrder: number): T[] {
-        // fill columns
-        this.fillColumns(0);
+        const traverseWithColumnNumber = (
+            node: ITreeNode<T>,
+            column: number,
+            callback: (node: ITreeNode<T>, column: number) => void
+        ) => {
+            callback(node, column);
+
+            if (node.left)  { traverseWithColumnNumber(node.left,  column - 1, callback) }
+            if (node.right) { traverseWithColumnNumber(node.right, column + 1, callback) }
+        }
+
         const result: T[] = [];
-        this.traverse(TraverseType.DFS_INORDER, node => {
-            if (node!.column === columnOrder) result.push(node!.value);
+        traverseWithColumnNumber(this.tree, 0, (node, column) => {
+            if (column === columnOrder) result.push(node.value);
         })
         return result;
     }
 
     public traverse(traverseType: TraverseType, callback?: (tree?: ITreeNode<T>) => void): T[] {
         function assertNever(arg: never): never {
-            throw new Error(`${Errors.UNEXPECTED_ARG}: ${arg}`);
+            throw new Error(`${Errors.UnexpectedArg}: ${arg}`);
         }
 
-        if (traverseType === TraverseType.BFS) {
+        if (traverseType === TraverseType.Bfs) {
             const result: T[] = [];
             const queue: ITreeNode<T>[] = [this.tree];
 
@@ -64,31 +63,30 @@ export class BinaryTree<T = number> implements IBinaryTree<T> {
                 const node = queue.shift();
                     result.push(node!.value);
                     if (callback) callback(node);
-                    if (node!.left  !== undefined) queue.push(node!.left);
-                    if (node!.right !== undefined) queue.push(node!.right);
+                    if (node && node.left  !== undefined) queue.push(node.left);
+                    if (node && node.right !== undefined) queue.push(node.right);
             }
             return result;
         } else {
-            const leftNode  = this.tree.left;
-            const rightNode = this.tree.right;
+            const {left: leftNode, right: rightNode}  = this.tree;
             const leftArr  = leftNode  === undefined ? [] : new BinaryTree(leftNode).traverse(traverseType, callback);
             const rightArr = rightNode === undefined ? [] : new BinaryTree(rightNode).traverse(traverseType, callback);
             if (callback) callback(this.tree);
             switch (traverseType) {
-                case TraverseType.DFS_PREORDER:
+                case TraverseType.DfsPreorder:
                     return [
                         this.tree.value,
                         ...leftArr,
                         ...rightArr,
                     ]
-                case TraverseType.DFS_INORDER: {
+                case TraverseType.DfsInorder: {
                     return [
                         ...leftArr,
                         this.tree.value,
                         ...rightArr
                     ]
                 }
-                case TraverseType.DFS_POSTORDER: {
+                case TraverseType.DfsPostOrder: {
                     return [
                         ...leftArr,
                         ...rightArr,
@@ -107,10 +105,10 @@ export interface IBinarySearchTree extends IBinaryTree<number> {
 }
 
 export class BinarySearchTree extends BinaryTree<number> implements IBinarySearchTree {
-    has(value: number): boolean {
+    public has(value: number): boolean {
         let has = false;
-        this.traverse(TraverseType.BFS, item => {
-            if (item!.value === value) has = true;
+        this.traverse(TraverseType.Bfs, item => {
+            if (item && item.value === value) has = true;
         })
         return has;
     }

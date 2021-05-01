@@ -1,1 +1,5 @@
+/.idea
 **/node_modules/
+/homeworks/**/coverage/
+/homeworks/**/build/
+node_modules
