@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "strictNullChecks": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node"
+  }
+}

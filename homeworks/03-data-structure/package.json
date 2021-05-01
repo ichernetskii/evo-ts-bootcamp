@@ -1,0 +1,17 @@
+{
+  "name": "03-data-structure",
+  "private": true,
+  "version": "0.0.1",
+  "description": "03. Data structure homework.",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch-all --coverage"
+  },
+    "devDependencies": {
+    "@types/jest": "^26.0.22",
+    "jest": "^26.6.3",
+    "ts-jest": "^26.5.5",
+    "typescript": "^4.2.4"
+  }
+}
