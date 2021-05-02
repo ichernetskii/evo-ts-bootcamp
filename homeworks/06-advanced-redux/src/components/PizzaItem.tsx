@@ -10,7 +10,7 @@ interface PizzaItemProps {
     onAdd: (_id: string) => void;
 }
 
-export function PizzaItem({ onAdd, price, _id }: PizzaItemProps) {
+export function PizzaItem({ onAdd, price, _id, name }: PizzaItemProps) {
     const onClick = React.useCallback(() => {
         onAdd(_id);
     }, [onAdd, _id]);
@@ -24,7 +24,7 @@ export function PizzaItem({ onAdd, price, _id }: PizzaItemProps) {
             </div>
             <div className="flex p-2">
                 <div className="w-full">
-                    <PizzaName name="Italian pizza" />
+                    <PizzaName name={name} />
                     <PizzaPrice price={price} />
                 </div>
                 <Circle onClick={onClick} type="plus" />
