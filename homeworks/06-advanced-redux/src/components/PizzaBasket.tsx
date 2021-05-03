@@ -9,20 +9,22 @@ interface PizzaBasketProps {
     onMinus: (_id: string) => void;
 }
 
-const PizzaBasket: React.FC<PizzaBasketProps> = ({basket, onMinus}: PizzaBasketProps) => (
-    <>
-        {
-            basket.map((p => <PizzaBasketItem
-                _id={p._id}
-                onMinus={onMinus}
-                key={p._id}
-                price={p.price}
-                name={p.name}
-                count={p.count}
-            />))
-        }
-    </>
-)
+const PizzaBasket: React.FC<PizzaBasketProps> = ({basket, onMinus}: PizzaBasketProps) => {
+    return (
+        <>
+            {
+                basket.map((p => <PizzaBasketItem
+                    _id={p._id}
+                    onMinus={onMinus}
+                    key={p._id}
+                    price={p.price}
+                    name={p.name}
+                    count={p.count}
+                />))
+            }
+        </>
+    )
+}
 
 const mapStateToProps = (state: State) => ({
     basket: state.basket

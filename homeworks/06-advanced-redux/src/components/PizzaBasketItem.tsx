@@ -13,7 +13,7 @@ interface PizzaProps {
     _id: string;
 }
 
-export function PizzaBasketItem({ onMinus, _id, price, name, count }: PizzaProps) {
+const PizzaBasketItem = React.memo(({ onMinus, _id, price, name, count }: PizzaProps) => {
     const onClick = React.useCallback(() => {
         onMinus(_id);
     }, [onMinus, _id]);
@@ -38,4 +38,6 @@ export function PizzaBasketItem({ onMinus, _id, price, name, count }: PizzaProps
             </div>
         </div>
     );
-}
+})
+
+export {PizzaBasketItem};
