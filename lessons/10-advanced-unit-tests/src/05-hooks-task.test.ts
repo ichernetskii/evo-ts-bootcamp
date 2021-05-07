@@ -23,14 +23,49 @@ describe("05-hooks-task", () => {
       handler.mockReset()
     })
 
-    it.todo("renders a hook")
+    it("renders a hook", () => {
+      expect(renderHook(() => useEventListener({eventName, element, handler}))).toBeDefined();
+    })
 
-    it.todo("adds correct event listener")
+    it("adds correct event listener", () => {
+      renderHook(() => useEventListener({eventName, element, handler}))
+      expect(listeners.has("click")).toBeTruthy()
+    })
 
-    it.todo("removes attached event listener")
+    it("removes attached event listener", () => {
+      const { unmount } = renderHook(() => useEventListener({eventName, element, handler}));
+      unmount()
+      expect(listeners.has("click")).toBeFalsy()
+    })
 
-    it.todo("re-attaches event listener if event name is changed")
+    it("re-attaches event listener if event name is changed", () => {
+      const { rerender } = renderHook(useEventListener, {
+        initialProps: { eventName, handler, element }
+      });
 
-    it.todo("does not re-attach event listener if event handler is changed")
+      rerender({
+        eventName: "new event",
+        element,
+        handler
+      })
+
+      expect(listeners.has("new event")).toBe(true);
+    })
+
+    it("does not re-attach event listener if event handler is changed", () => {
+      const foo = jest.fn();
+
+      const { rerender } = renderHook(useEventListener, {
+        initialProps: { eventName, handler, element }
+      });
+
+      rerender({
+        eventName,
+        element,
+        handler: foo
+      })
+
+      expect(element.addEventListener).toHaveBeenCalledTimes(1);
+    })
   })
 })

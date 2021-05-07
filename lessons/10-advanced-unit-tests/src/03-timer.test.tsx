@@ -32,8 +32,44 @@ describe("03-timer", () => {
       expect(getByTestId("datetime")).toHaveTextContent("2021-05-03 00:00:00")
     })
 
-    it.todo("changes datetime each seconds when start button is clicked")
+    it("changes datetime each seconds when start button is clicked", () => {
+      const {getByTestId, getByText} = render(<Timer />);
+      const startButton = getByText("start");
+      act(() => {
+        startButton.click();
+      })
 
-    it.todo("stops updating datetime when stop button is clicked")
+      act(() => {
+        jest.advanceTimersByTime(1000)
+      })
+      expect(getByTestId("datetime")).toHaveTextContent("2021-05-03 00:00:01");
+      act(() => {
+        jest.advanceTimersByTime(1000)
+      })
+      expect(getByTestId("datetime")).toHaveTextContent("2021-05-03 00:00:02");
+    })
+
+    it("stops updating datetime when stop button is clicked", () => {
+      const {getByTestId, getByText} = render(<Timer />);
+      const startButton = getByText("start");
+      const stopButton = getByText("stop");
+      act(() => {
+        startButton.click();
+      })
+
+      act(() => {
+        jest.advanceTimersByTime(1000)
+      })
+
+      act(() => {
+        stopButton.click();
+      })
+
+      act(() => {
+        jest.advanceTimersByTime(1000)
+      })
+
+      expect(getByTestId("datetime")).toHaveTextContent("2021-05-03 00:00:01");
+    })
   })
 })

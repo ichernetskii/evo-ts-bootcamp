@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`07-snapshot Message has a proper content #1 1`] = `
+<div
+  style="color: rgb(255, 0, 0);"
+>
+  hello
+</div>
+`;
+
+exports[`07-snapshot Message has a proper content #2 1`] = `
+<div>
+  hello
+</div>
+`;
