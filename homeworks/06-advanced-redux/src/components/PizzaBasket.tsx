@@ -1,21 +1,40 @@
-import * as R from "ramda";
 import React from "react";
-import {Pizza} from "../types";
+import {State} from "../types";
 import {PizzaBasketItem} from "./PizzaBasketItem";
+import {connect} from "react-redux";
+import {removePizza} from "../store/actionCreators";
 
-interface PizzaBucketProps {
-    pizza: Array<Pizza & {count: number}>,
+interface PizzaBasketProps {
+    basket: State["basket"],
     onMinus: (_id: string) => void;
 }
 
-export function PizzaBasket({pizza, onMinus}: PizzaBucketProps) {
-    return R.map((p) =>
-        <PizzaBasketItem
-            _id={p._id}
-            onMinus={onMinus}
-            key={p._id}
-            price={p.price}
-            name={p.name}
-            count={p.count}
-        />, pizza);
+const PizzaBasket: React.FC<PizzaBasketProps> = ({basket, onMinus}: PizzaBasketProps) => {
+    return (
+        <>
+            {
+                basket.map((p => <PizzaBasketItem
+                    _id={p._id}
+                    onMinus={onMinus}
+                    key={p._id}
+                    price={p.price}
+                    name={p.name}
+                    count={p.count}
+                />))
+            }
+        </>
+    )
 }
+
+const mapStateToProps = (state: State) => ({
+    basket: state.basket
+})
+
+const mapDispatchToProps = {
+    onMinus: removePizza
+}
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(PizzaBasket);

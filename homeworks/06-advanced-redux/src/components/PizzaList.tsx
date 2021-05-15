@@ -1,23 +1,37 @@
 import React from "react";
 import { PizzaItem } from "./PizzaItem";
-import * as R from "ramda";
+import {connect} from "react-redux";
+import {addPizza} from "../store/actionCreators";
+import {State} from "../types";
 
 interface PizzaListProps {
-    pizza: {
-        _id: string;
-        name: string;
-        price: number;
-    }[];
+    pizza: State["pizza"];
     onAdd: (_id: string) => void;
 }
 
-export function PizzaList({ pizza, onAdd }: PizzaListProps) {
-    return R.map((p) =>
-        <PizzaItem
-            key={p._id}
-            _id={p._id}
-            name={p.name}
-            price={p.price}
-            onAdd={onAdd}
-        />, pizza);
+const PizzaList: React.FC<PizzaListProps> = ({pizza, onAdd}) => (
+    <>
+        {
+            pizza.map(p => <PizzaItem
+                key={p._id}
+                _id={p._id}
+                name={p.name}
+                price={p.price}
+                onAdd={onAdd}
+            />)
+        }
+    </>
+)
+
+const mapStateToProps = (state: State) => ({
+    pizza: state.pizza
+})
+
+const mapDispatchToProps = {
+    onAdd: addPizza
 }
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(PizzaList);
