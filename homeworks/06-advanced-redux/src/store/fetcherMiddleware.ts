@@ -9,9 +9,11 @@ export const fetcherMiddleware: Middleware<{}, State> = ({ getState, dispatch })
 
     if ([ActionTypes.PizzaAdded, ActionTypes.PizzaRemoved].includes(action.type)) {
         const payload = action.payload;
-        const pizza = getState().pizza.filter(p => p._id === payload)[0];
-        result.pizzaName = pizza.name;
-        result.pizzaPrice = pizza.price;
+        const pizza = getState().pizza.find(p => p._id === payload);
+        if (pizza) {
+            result.pizzaName = pizza.name;
+            result.pizzaPrice = pizza.price;
+        }
     }
 
     // fetch

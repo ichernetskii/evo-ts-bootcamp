@@ -13,7 +13,7 @@ interface PizzaProps {
     _id: string;
 }
 
-const PizzaBasketItem = React.memo(({ onMinus, _id, price, name, count }: PizzaProps) => {
+const PizzaBasketItem = ({ onMinus, _id, price, name, count }: PizzaProps) => {
     const onClick = React.useCallback(() => {
         onMinus(_id);
     }, [onMinus, _id]);
@@ -38,6 +38,6 @@ const PizzaBasketItem = React.memo(({ onMinus, _id, price, name, count }: PizzaP
             </div>
         </div>
     );
-})
+}
 
 export {PizzaBasketItem};
