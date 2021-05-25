@@ -1,0 +1,28 @@
+{
+  "name": "11-css-animations",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "webpack",
+    "watch": "webpack serve"
+  },
+  "author": "Ilya Chernetsky <ilya.chernetsky@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "svg-url-loader": "^7.1.1",
+    "webpack": "^5.37.1"
+  },
+  "devDependencies": {
+    "css-loader": "^5.2.6",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.3.1",
+    "sass": "^1.34.0",
+    "sass-loader": "^11.1.1",
+    "style-loader": "^2.0.0",
+    "webpack-cli": "^4.7.0",
+    "webpack-dev-server": "^3.11.2"
+  }
+}
