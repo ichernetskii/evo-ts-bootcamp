@@ -38,7 +38,7 @@ body {
   &_3-loader-1 {
     @keyframes loader-3-1-ease {
       0% {
-        stroke-dasharray: 0 (2*$pi*$r3)
+        stroke-dasharray: 0 2*$pi*$r3
       }
       50% {
         stroke-dasharray: 2*$pi*$r3 0;
@@ -58,7 +58,7 @@ body {
         stroke-dasharray: 2*$pi*$r3 0;
       }
       100% {
-        stroke-dasharray: 0 (2*$pi*$r3)
+        stroke-dasharray: 0 2*$pi*$r3;
       }
     }
 
@@ -70,9 +70,9 @@ body {
 
   &_3-loader-2 {
     @keyframes loader-3-2 {
-      0%   { stroke-dashoffset: 5/2 * $pi * $r3 + 40 }
+      0%   { stroke-dashoffset: 1/2 * $pi * $r3 + 40 }
       50%  { stroke-dasharray: 100 (2*$pi*$r3 - 100) }
-      100% { stroke-dashoffset: 1/2 * $pi * $r3 + 40 }
+      100% { stroke-dashoffset: -3/2 * $pi * $r3 + 40 }
     }
 
     stroke: #999;
