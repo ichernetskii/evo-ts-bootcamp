@@ -10,23 +10,10 @@ const Images: React.FC = () => {
 	const images = useSelector(selectImagesBySol);
 	const isLoading = useSelector(selectIsLoading);
 
-	return (
-		<>
-			{
-				isLoading
-					? <div className={s.text}>Loading...</div>
-					: images
-						? images.length
-							? images.map(image =>
-								<Image
-									{...image}
-									key={image.id}
-								/>)
-							: <div className={s.text}>No fotos for this sol :(</div>
-						: <div className={s.text}>Not loaded</div>
-			}
-		</>
-	)
+	if (isLoading) return <div className={s.text}>Loading...</div>;
+	if (!images) return <div className={s.text}>Not loaded</div>;
+	if (!images.length) return <div className={s.text}>No photos for this sol :(</div>;
+	return <> { images.map(image => <Image {...image} key={image.id} />) } </>
 };
 
 export default Images;

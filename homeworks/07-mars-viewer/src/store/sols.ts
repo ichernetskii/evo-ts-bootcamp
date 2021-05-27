@@ -37,7 +37,7 @@ const initialState: ISols = {
 export const loadImages: any = createAsyncThunk<IImage[], number, {}>(
 	"sols/loadImages",
 	async (sol) => {
-		const response = await fetch(`https://api.nasa.gov/mars-photos/api/v1/rovers/perseverance/photos?sol=${sol}&api_key=etwdnixT9DMgG9WbdSmHEqbReflMHWMEYUosQOyf`);
+		const response = await fetch(`https://api.nasa.gov/mars-photos/api/v1/rovers/perseverance/photos?sol=${sol}&api_key=${process.env.REACT_APP_API_KEY}`);
 		const json: IResponse = await response.json();
 		return json?.photos.map((photo) => ({
 			id: photo.id,

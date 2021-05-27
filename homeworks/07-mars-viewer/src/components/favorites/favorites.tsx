@@ -9,18 +9,17 @@ const Favorites: React.FC = () => {
 	const favorites = useSelector(selectFavorites);
 	const images = useSelector(selectImages);
 
-	const result: ReactElement[] = [];
-
-	Object.values(images).forEach((solImages: IImage[]) => {
-		solImages.forEach(image => {
-			if (favorites.includes(image.id)) result.push(<Image {...image} />)
-		})
-	})
+	const favoriteImages = Object
+		.values(images)
+		.reduce((acc, solImages) =>
+			acc.concat(solImages.filter((image: IImage) => favorites.includes(image.id))), []
+		)
+		.map((image: IImage) => <Image key={image.id} {...image} />)
 
 	return (
 		<>
 			{
-				result.length ? result : <div className={s.caption}>No favorites photos, add some!</div>
+				favoriteImages.length ? favoriteImages : <div className={s.caption}>No favorites photos, add some!</div>
 			}
 		</>
 	)
