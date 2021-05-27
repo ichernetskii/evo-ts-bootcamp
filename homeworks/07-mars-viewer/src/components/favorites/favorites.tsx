@@ -1,4 +1,4 @@
-import React, {ReactElement} from "react";
+import React from "react";
 import s from "./favorites.module.scss";
 import {useSelector} from "react-redux";
 import {selectFavorites, selectImages} from "../../store/store";
