@@ -9,14 +9,14 @@ export class Caesar {
 
     private action(shift: number) {
         Array.from(this.text).forEach(letter => {
-            if (letter.search("[a-zA-Z\n\r]") !== 0) throw new Error(`${letter} isn't a letter`);
+            if (letter.search(/[a-zA-Z\s]/g) !== 0) throw new Error(`${letter} isn't a letter`);
         });
 
         const code_a = "a".charCodeAt(0);
         const code_A = "A".charCodeAt(0);
 
         return Array.from(this.text).map(letter => {
-            if ("\r\n".search(letter) !== -1) return letter;
+            if (letter.search(/\s/g) !== -1) return letter;
             const firstLetter = (letter.search("[a-z]") === 0) ? code_a : code_A;
             const newCharCode = (letter.charCodeAt(0) + shift - firstLetter + 26) % 26 + firstLetter;
             return String.fromCharCode(newCharCode);
