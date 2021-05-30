@@ -1,0 +1,122 @@
+$pi: 3.14159;
+$r2: 105;
+$r3: 85;
+$period: 2s;
+
+body {
+  margin: 0;
+}
+
+#root {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.circle {
+  stroke: #EEE;
+  fill: transparent;
+
+  &_1 { stroke-width: 10 }
+
+  &_2 { stroke-width: 1 }
+
+  &_2-loader {
+    @keyframes loader-2 {
+      0%   { stroke-dashoffset: 1/2 * $pi * $r2 }
+      100% { stroke-dashoffset: 5/2 * $pi * $r2 }
+    }
+
+    stroke: #BBB;
+    stroke-dasharray: 20 (2*$pi*$r2 - 20);
+    animation: loader-2 $period cubic-bezier(0.83, 0, 0.17, 1) infinite;
+  }
+
+  &_3 { stroke-width: 4 }
+
+  &_3-loader-1 {
+    @keyframes loader-3-1-ease {
+      0% {
+        stroke-dasharray: 0 2*$pi*$r3
+      }
+      50% {
+        stroke-dasharray: 2*$pi*$r3 0;
+        stroke-dashoffset: 7/2 * $pi * $r3;
+      }
+      100% {
+        stroke-dashoffset: 1/2 * $pi * $r3;
+      }
+    }
+
+    @keyframes loader-3-1-linear {
+      0% {
+        stroke-dashoffset: 9/2 * $pi * $r3;
+      }
+      50% {
+        stroke-dashoffset: 7/2 * $pi * $r3;
+        stroke-dasharray: 2*$pi*$r3 0;
+      }
+      100% {
+        stroke-dasharray: 0 2*$pi*$r3;
+      }
+    }
+
+    stroke: #CCC;
+    animation:
+            loader-3-1-ease   $period cubic-bezier(0.16, 1, 0.3, 1) infinite,
+            loader-3-1-linear $period linear infinite;
+  }
+
+  &_3-loader-2 {
+    @keyframes loader-3-2 {
+      0%   { stroke-dashoffset: 1/2 * $pi * $r3 + 40 }
+      50%  { stroke-dasharray: 100 (2*$pi*$r3 - 100) }
+      100% { stroke-dashoffset: -3/2 * $pi * $r3 + 40 }
+    }
+
+    stroke: #999;
+    stroke-dasharray: 40 (2*$pi*$r3 - 40);
+    animation: loader-3-2 $period linear infinite;
+  }
+}
+
+.hexagon {
+  fill: #4D5C77;
+  x: 135;
+  transform-origin: center;
+
+  &_1 { transform: rotate(-30deg) translateY(-30px) rotateZ(60deg) }
+  &_2 { transform: rotate(30deg) translateY(-30px) rotateZ(60deg) }
+  &_3 { transform: rotate(90deg) translateY(-30px) rotateZ(60deg) }
+  &_4 { transform: rotate(150deg) translateY(-30px) rotateZ(60deg) }
+  &_5 { transform: rotate(210deg) translateY(-30px) rotateZ(60deg) }
+  &_6 { transform: rotate(270deg) translateY(-30px) rotateZ(60deg) }
+  &_7 { transform: rotate(30deg) rotateZ(60deg) }
+}
+
+.g {
+  @keyframes hexagon-animation {
+    0%, 65%, 100% {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+
+    15%, 50% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: hexagon-animation $period ease-in-out infinite;
+
+  &_1 { animation-delay: 0s }
+  &_2 { animation-delay: $period/16 }
+  &_3 { animation-delay: 2*$period/16 }
+  &_4 { animation-delay: 3*$period/16 }
+  &_5 { animation-delay: 4*$period/16 }
+  &_6 { animation-delay: 5*$period/16 }
+  &_7 { animation-delay: 6*$period/16 }
+}

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>CSS Animations</title>
+</head>
+<body>
+    <div id="root">
+        <svg width="300" height="300" viewBox="0 0 300 300">
+            <symbol id="hexagon" viewBox="-100 -87 200 174">
+<!--                <polygon id="hexagon" points="10,0 5,-8.7 -5,-8.7 -10,0 -5,8.7 5,8.7" />-->
+                <g>
+                    <polygon points="100,0 50,-87 -50,-87 -100,-0 -50,87 50,87" />
+                </g>
+            </symbol>
+
+
+            <circle class="circle circle_1" cx="150" cy="150" r="140" />
+
+            <circle class="circle circle_2" cx="150" cy="150" r="105" />
+            <circle class="circle circle_2 circle_2-loader" cx="150" cy="150" r="105" />
+
+            <circle class="circle circle_3" cx="150" cy="150" r="85" />
+            <circle class="circle circle_3 circle_3-loader-1" cx="150" cy="150" r="85" />
+            <circle class="circle circle_3 circle_3-loader-2" cx="150" cy="150" r="85" />
+
+            <g class="g g_1">
+                <use class="hexagon hexagon_1" href="#hexagon" width="30" x="135" />
+            </g>
+            <g class="g g_2">
+                <use class="hexagon hexagon_2" href="#hexagon" width="30" x="135" />
+            </g>
+            <g class="g g_3">
+                <use class="hexagon hexagon_3" href="#hexagon" width="30" x="135" />
+            </g>
+            <g class="g g_4">
+                <use class="hexagon hexagon_4" href="#hexagon" width="30" x="135" />
+            </g>
+            <g class="g g_5">
+                <use class="hexagon hexagon_5" href="#hexagon" width="30" x="135" />
+            </g>
+            <g class="g g_6">
+                <use class="hexagon hexagon_6" href="#hexagon" width="30" x="135" />
+            </g>
+            <g class="g g_7">
+                <use class="hexagon hexagon_7" href="#hexagon" width="30" x="135" />
+            </g>
+        </svg>
+    </div>
+</body>
+</html>
