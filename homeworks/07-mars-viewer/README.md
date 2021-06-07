@@ -1,5 +1,9 @@
 # Mars viewer
 
+--== Solution: [https://mars-viewer.netlify.app](https://mars-viewer.netlify.app) ==--
+
+
+
 **Deadline: 23.05.2021 23:59 Minsk**
 
 ## Task description
@@ -14,10 +18,10 @@ What is required:
 - Use React for rendering
 - Use redux or redux-toolkit. You can use create-react-app template for such purpose: `npx create-react-app --template redux-typescript mars-viewer`
 - Implement:
-  - select sols
-  - keep fetched data from nasa api in redux-store
-  - add to favourites
-  - remove from favourites
+    - select sols
+    - keep fetched data from nasa api in redux-store
+    - add to favourites
+    - remove from favourites
 - Define types as much and clear as possible.
 - Deploy your implementation on the Internet (free resources:
   [gh-pages](https://pages.github.com/), [surge](http://surge.sh),
@@ -44,4 +48,3 @@ your application and add the deployed link there as well.
 Please share the link of your Pull Request in appropriate Slack channel:
 [ts-bootcamp-common-2021](https://evolutiongaming.slack.com/archives/C01TBBGC18U)
 in the thread with the homework announcement when it is ready for review.
-

@@ -1,0 +1,16 @@
+.root {
+  width: 30px;
+  position: absolute;
+  height: 30px;
+  left: 15px;
+  top: 15px;
+}
+
+.heart {
+  cursor: pointer;
+  fill: transparentize(#BBB, 0.2);
+
+  &_favorite {
+    fill: #A00;
+  }
+}
