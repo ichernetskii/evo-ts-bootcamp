@@ -1,0 +1,15 @@
+#root {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+#btnNewHouse {
+  margin: 10px;
+}
+
+#canvas {
+  display: block;
+  user-select: none;
+  cursor: url("./images/aim.png") 32 32, pointer;
+}
