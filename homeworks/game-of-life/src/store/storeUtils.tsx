@@ -1,19 +1,18 @@
 import React from "react";
-import {Store} from "./store";
 
-const StoreContext = React.createContext<Store>({
-	gridSize: 5
-});
+export function createContext<StoresMap extends { [K: string]: object }>(stores: StoresMap) {
+	const StoreContext = React.createContext<StoresMap>(undefined!);
 
-const StoreProvider: React.FC<{ store: Store }> = ({
-													   children,
-													   store,
-												   }) => (
-	<StoreContext.Provider value={store}>
-		{children}
-	</StoreContext.Provider>
-)
+	const StoreProvider: React.FC<{}> = ({children}) => (
+		<StoreContext.Provider value={stores}>{children}</StoreContext.Provider>
+	)
 
-const useStore = () => React.useContext(StoreContext);
+	function useStore<K extends keyof StoresMap>(storeKey: K): StoresMap[K] {
+		return React.useContext(StoreContext)[storeKey];
+	}
 
-export {StoreProvider, useStore};
+	return {
+		StoreProvider,
+		useStore
+	}
+}

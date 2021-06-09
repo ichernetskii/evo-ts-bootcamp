@@ -1,11 +1,8 @@
-import {makeAutoObservable} from "mobx";
+import {createContext} from "./storeUtils";
+import config from "./config";
+import points from "./points";
 
-export class Store {
-	gridSize?: number = 5;
-
-	constructor() {
-		makeAutoObservable(this);
-	}
-}
-
-export default new Store();
+export const {StoreProvider, useStore} = createContext({
+	config,
+	points
+})

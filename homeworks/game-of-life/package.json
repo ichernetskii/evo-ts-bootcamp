@@ -21,6 +21,9 @@
     "typescript": "^4.3.2",
     "web-vitals": "^1.0.1"
   },
+  "devDependencies": {
+    "sass": "^1.34.1"
+  },
   "resolutions": {
     "styled-components": "^5"
   },
