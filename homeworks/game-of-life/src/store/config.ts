@@ -7,17 +7,18 @@ export interface IPosition {
 
 class Config {
 	centerPosition: IPosition = { x: 0, y: 0 }; // screen coords
-	grid: number = 20; // px
-	delay: number = 1000; // ms
+	grid: number = 15; // px
+	delay: number = 50; // ms
 	paused: boolean = false;
-	mouseDown: IPosition | null = null
+	mouseDown: IPosition | null = null;
 
 	constructor() {
 		makeAutoObservable(this, {
 			togglePaused: action.bound,
 			setMouseDown: action.bound,
 			setCenterPosition: action.bound,
-			zoomGrid: action.bound
+			zoomGrid: action.bound,
+			setDelay: action.bound,
 		})
 	}
 
@@ -35,6 +36,10 @@ class Config {
 
 	zoomGrid(zoom: number) {
 		this.grid *= zoom;
+	}
+
+	setDelay(delay: number) {
+		this.delay = delay;
 	}
 }
 

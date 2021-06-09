@@ -12,14 +12,38 @@ const MainWrapper = styled.div`
 	display: flex;
 `;
 
-const Toolbar = styled.nav`
+const Toolbar = styled.aside`
+	padding: 2em;
+	box-sizing: border-box;
 	background: #CCC;
 	flex: 0 0 300px;
+	position: relative;
 `
+
+const Header = styled.h1`
+	text-align: center;
+`;
+
+const List = styled.ul`
+	padding-left: 20px;
+`;
+
+const Button = styled.button`
+	margin: 20px 0;
+	padding: 10px 30px;
+	border: 1px solid #999;
+	cursor: pointer;
+	width: 100px;
+
+	&:hover {
+		background-color: #DDD;
+	}
+`;
 
 const App = observer(() => {
 	const config = useStore("config");
-	const {centerPosition, grid, togglePaused, setMouseDown, mouseDown, setCenterPosition, zoomGrid} = config;
+	const {centerPosition, grid, togglePaused, setMouseDown,
+		mouseDown, setCenterPosition, zoomGrid, setDelay, delay} = config;
 	const {points, nextGeneration, deletePoint, addPoint} = useStore("points");
 
 	const screenToAxis = (position: IPosition): IPoint => ({
@@ -79,12 +103,12 @@ const App = observer(() => {
 	useEffect(() => {
 		const timer = setInterval(function () {
 			if (!config.paused) nextGeneration();
-		}, 1000);
+		}, delay);
 
 		return () => {
 			clearInterval(timer);
 		}
-	}, []);
+	}, [delay, config.paused, nextGeneration]);
 
   	return (
 		<MainWrapper>
@@ -125,11 +149,19 @@ const App = observer(() => {
 				}}
 			/>
 			<Toolbar>
-				<h1>Game of life</h1>
+				<Header>Game of life</Header>
+				<div>
+					<p>Delay animation: {delay.toString()}</p>
+					<input type="range" min={10} max={1000} step={10} defaultValue={delay} onChange={e => {
+						setDelay(Number.parseInt(e.target.value));
+					}} />
+				</div>
+				<Button onClick={togglePaused}>{config.paused ? "Play" : "Pause"}</Button>
 				<p>Control:</p>
-				<p>Moving/zooming by mouse</p>
-				<p>Add points when paused</p>
-				<button onClick={togglePaused}>{config.paused ? "Play" : "Pause"}</button>
+				<List>
+					<li>Drag & move/scroll by mouse</li>
+					<li>Add points when paused</li>
+				</List>
 			</Toolbar>
 		</MainWrapper>
   	);

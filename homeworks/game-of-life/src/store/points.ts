@@ -42,16 +42,16 @@ const getNeighboursCount = (field: IPoint[], point: IPoint): number => {
 
 class Points {
 	points: IPoint[] = [
-		{x: 0, y: 0},
-		{x: 1, y: 0},
-		{x: -4, y: -1},
-		{x: 3, y: -3},
-		{x: -2, y: 6},
-		{x: 20, y: 10},
-		{x: 21, y: 10},
-		{x: 22, y: 10},
-		{x: 22, y: 9},
-		{x: 21, y: 8}
+		{x: 30, y: 20},
+		{x: 30, y: 21},
+		{x: 31, y: 21},
+		{x: 30, y: 22},
+		{x: 29, y: 22},
+		{x: 5, y: 20},
+		{x: 6, y: 20},
+		{x: 7, y: 20},
+		{x: 7, y: 19},
+		{x: 6, y: 18}
 	];
 
 	constructor() {
