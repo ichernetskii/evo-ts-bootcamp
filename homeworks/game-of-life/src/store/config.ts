@@ -5,12 +5,20 @@ export interface IPosition {
 	y: number
 }
 
+export enum ICursor {
+	Add = "copy",
+	Delete = "alias",
+	Move = "grabbing",
+	Playback = "pointer"
+}
+
 class Config {
 	centerPosition: IPosition = { x: 0, y: 0 }; // screen coords
 	grid: number = 15; // px
-	delay: number = 50; // ms
+	delay: number = 100; // ms
 	paused: boolean = false;
 	mouseDown: IPosition | null = null;
+	cursor: ICursor = ICursor.Playback
 
 	constructor() {
 		makeAutoObservable(this, {
@@ -19,6 +27,7 @@ class Config {
 			setCenterPosition: action.bound,
 			zoomGrid: action.bound,
 			setDelay: action.bound,
+			setCursor: action.bound
 		})
 	}
 
@@ -40,6 +49,10 @@ class Config {
 
 	setDelay(delay: number) {
 		this.delay = delay;
+	}
+
+	setCursor(cursor: ICursor) {
+		this.cursor = cursor;
 	}
 }
 

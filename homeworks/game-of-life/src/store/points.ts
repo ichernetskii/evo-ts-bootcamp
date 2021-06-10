@@ -41,7 +41,7 @@ const getNeighboursCount = (field: IPoint[], point: IPoint): number => {
 }
 
 class Points {
-	points: IPoint[] = [
+	data: IPoint[] = [
 		{x: 30, y: 20},
 		{x: 30, y: 21},
 		{x: 31, y: 21},
@@ -56,7 +56,7 @@ class Points {
 
 	constructor() {
 		makeAutoObservable(this, {
-			points: observable,
+			data: observable,
 			nextGeneration: action.bound,
 			deletePoint: action.bound,
 			addPoint: action.bound
@@ -66,7 +66,7 @@ class Points {
 	nextGeneration() {
 		const result: IPoint[] = [];
 		const pointsSet: IPoint[] = [];
-		this.points.forEach(point => {
+		this.data.forEach(point => {
 			getAllNeighbours(point).forEach(p => {
 				if (!pointExistInArray(pointsSet, p)) {
 					pointsSet.push(p);
@@ -75,24 +75,25 @@ class Points {
 		})
 
 		pointsSet.forEach(point => {
-			if (pointExistInArray(this.points, point)) {
+			if (pointExistInArray(this.data, point)) {
 				// alive point
-				if ([2, 3].includes(getNeighboursCount(this.points, point))) result.push(point);
+				if ([2, 3].includes(getNeighboursCount(this.data, point))) result.push(point);
 			} else {
 				// dead point
-				if (getNeighboursCount(this.points, point) === 3) result.push(point);
+				if (getNeighboursCount(this.data, point) === 3) result.push(point);
 			}
 		})
 
-		this.points = result;
+		this.data = result;
 	}
 
 	deletePoint(point: IPoint) {
-		this.points = this.points.filter(p => !pointsEqual(p, point));
+		this.data = this.data.filter(p => !pointsEqual(p, point));
 	}
 
 	addPoint(point: IPoint) {
-		this.points.push(point);
+		// this.data.push(point);
+		this.data = [...this.data, point];
 	}
 }
 

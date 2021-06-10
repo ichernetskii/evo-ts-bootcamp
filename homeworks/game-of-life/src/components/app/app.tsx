@@ -1,9 +1,9 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {observer} from "mobx-react-lite";
 import styled from "styled-components";
 import GameField from "../game-field/game-field";
 import {useStore} from "../../store/store";
-import {IPosition} from "../../store/config";
+import {ICursor, IPosition} from "../../store/config";
 import {IPoint, pointExistInArray, floor} from "../../store/points";
 
 const MainWrapper = styled.div`
@@ -16,7 +16,7 @@ const Toolbar = styled.aside`
 	padding: 2em;
 	box-sizing: border-box;
 	background: #CCC;
-	flex: 0 0 300px;
+	flex: 0 0 350px;
 	position: relative;
 `
 
@@ -28,23 +28,27 @@ const List = styled.ul`
 	padding-left: 20px;
 `;
 
-const Button = styled.button`
-	margin: 20px 0;
-	padding: 10px 30px;
-	border: 1px solid #999;
+const Range = styled.input`
 	cursor: pointer;
-	width: 100px;
-
-	&:hover {
-		background-color: #DDD;
-	}
 `;
 
 const App = observer(() => {
 	const config = useStore("config");
-	const {centerPosition, grid, togglePaused, setMouseDown,
-		mouseDown, setCenterPosition, zoomGrid, setDelay, delay} = config;
-	const {points, nextGeneration, deletePoint, addPoint} = useStore("points");
+	const {
+		centerPosition,
+		setCenterPosition,
+		grid,
+		paused,
+		togglePaused,
+		zoomGrid,
+		delay,
+		setDelay,
+		setMouseDown,
+		mouseDown,
+		setCursor
+	} = config;
+	const points = useStore("points");
+	const {data, deletePoint, addPoint} = points;
 
 	const screenToAxis = (position: IPosition): IPoint => ({
 		x: (position.x - config.centerPosition.x) / config.grid,
@@ -82,7 +86,7 @@ const App = observer(() => {
 		// points
 		ctx.beginPath();
 		ctx.fillStyle = "#000";
-		for (let point of points) {
+		for (let point of data) {
 			ctx.fillRect(
 				centerPosition.x + point.x*grid + 1,
 				centerPosition.y + point.y*grid + 1,
@@ -100,26 +104,17 @@ const App = observer(() => {
 		ctx.fill();
 	}
 
-	useEffect(() => {
-		const timer = setInterval(function () {
-			if (!config.paused) nextGeneration();
-		}, delay);
-
-		return () => {
-			clearInterval(timer);
-		}
-	}, [delay, config.paused, nextGeneration]);
-
   	return (
 		<MainWrapper>
 			<GameField
 				draw={draw}
 				onMouseDown={e => {
-					setMouseDown({x: e.clientX, y: e.clientY});
-
-					if (config.paused) {
+					if (e.button === 0) {
+						setMouseDown({ x: e.clientX, y: e.clientY });
+					}
+					if (e.button === 2 && paused) {
 						const point = floor(screenToAxis({x: e.clientX, y: e.clientY}));
-						if (pointExistInArray(points, point)) {
+						if (pointExistInArray(points.data, point)) {
 							deletePoint(point);
 						} else {
 							addPoint(point);
@@ -127,15 +122,38 @@ const App = observer(() => {
 
 					}
 				}}
-				onMouseUp={() => {
-					setMouseDown(null);
+				onMouseUp={e => {
+					setCursor(ICursor.Playback);
+					if (e.button === 0) {
+						if (e.clientX === mouseDown?.x && e.clientY === mouseDown?.y) {
+							togglePaused();
+						}
+						setMouseDown(null);
+					}
 				}}
 				onMouseMove={e => {
-					if (mouseDown) {
+					if (e.buttons === 1) {
+						setCursor(ICursor.Move);
 						setCenterPosition({
 							x: centerPosition.x + e.movementX,
 							y: centerPosition.y + e.movementY
 						})
+					}
+
+					if (e.buttons === 2 && config.paused) {
+						setCursor(ICursor.Add);
+						const point = floor(screenToAxis({x: e.clientX, y: e.clientY}));
+						if (!pointExistInArray(points.data, point)) {
+							addPoint(point);
+						}
+					}
+
+					if (e.buttons === 3 && config.paused) {
+						setCursor(ICursor.Delete);
+						const point = floor(screenToAxis({x: e.clientX, y: e.clientY}));
+						if (pointExistInArray(points.data, point)) {
+							deletePoint(point);
+						}
 					}
 				}}
 				OnWheel={e => {
@@ -147,20 +165,28 @@ const App = observer(() => {
 						y: centerPosition.y + (newAxisCoords.y - oldAxisCoords.y)*config.grid,
 					})
 				}}
+
 			/>
 			<Toolbar>
 				<Header>Game of life</Header>
 				<div>
 					<p>Delay animation: {delay.toString()}</p>
-					<input type="range" min={10} max={1000} step={10} defaultValue={delay} onChange={e => {
+					<Range type="range" min={10} max={1000} step={10} defaultValue={delay} onChange={e => {
 						setDelay(Number.parseInt(e.target.value));
 					}} />
 				</div>
-				<Button onClick={togglePaused}>{config.paused ? "Play" : "Pause"}</Button>
 				<p>Control:</p>
 				<List>
-					<li>Drag & move/scroll by mouse</li>
-					<li>Add points when paused</li>
+					<li>Left: pause/resume</li>
+					<li>Left + Move: move</li>
+					<li>Zoom</li>
+				</List>
+				<p>When paused:</p>
+				<List>
+					<li>Right: add/delete</li>
+					<li>Right + Move: add many</li>
+					<li>Left + Right + Move: delete many</li>
+
 				</List>
 			</Toolbar>
 		</MainWrapper>
