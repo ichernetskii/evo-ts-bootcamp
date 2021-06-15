@@ -40,19 +40,19 @@ const getNeighboursCount = (field: IPoint[], point: IPoint): number => {
 	return result;
 }
 
+const randomIntFromInterval = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1) + min);
+
+const generateRandomPoints = (n: number = 300, maxX: number = 40, maxY: number = 40): IPoint[] => {
+	const points: IPoint[] = [];
+	for (let i = 0; i < n; i++) {
+		const point = { x: randomIntFromInterval(0, maxX), y: randomIntFromInterval(0, maxY) }
+		if (!points.find(p => p.x === point.x && p.y === point.y)) points.push(point);
+	}
+	return points;
+}
+
 class Points {
-	data: IPoint[] = [
-		{x: 30, y: 20},
-		{x: 30, y: 21},
-		{x: 31, y: 21},
-		{x: 30, y: 22},
-		{x: 29, y: 22},
-		{x: 5, y: 20},
-		{x: 6, y: 20},
-		{x: 7, y: 20},
-		{x: 7, y: 19},
-		{x: 6, y: 18}
-	];
+	data: IPoint[] = generateRandomPoints();
 
 	constructor() {
 		makeAutoObservable(this, {
