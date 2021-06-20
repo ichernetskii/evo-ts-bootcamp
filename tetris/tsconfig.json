@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "strictNullChecks": true,
+    "outDir": "./dist/",
+    "sourceMap": true,
+    "lib": [
+      "ES2020",
+      "DOM"
+    ],
+    "noImplicitAny": true,
+    "module": "ES2020",
+    "target": "es5",
+    "allowJs": true,
+    "moduleResolution": "Node",
+    "jsx": "react-jsx"
+  }
+}
