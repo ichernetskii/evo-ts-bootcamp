@@ -1,5 +1,19 @@
-$color: green;
+body {
+  margin: 0;
+}
 
 .app {
-  color: $color;
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  font-family: sans-serif;
+  text-align: center;
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
 }

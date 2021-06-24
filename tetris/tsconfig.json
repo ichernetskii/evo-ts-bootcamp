@@ -9,9 +9,10 @@
     ],
     "noImplicitAny": true,
     "module": "ES2020",
-    "target": "es5",
+    "target": "ES6",
     "allowJs": true,
     "moduleResolution": "Node",
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "esModuleInterop": true
   }
 }

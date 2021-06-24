@@ -8,7 +8,8 @@
   "scripts": {
     "dev": "webpack --env mode=development",
     "watch": "webpack serve --env mode=development",
-    "prod": "webpack --env mode=production"
+    "prod": "webpack --env mode=production",
+    "test": "jest"
   },
   "author": "Ilya Chernetsky <ilya.chernetsky@gmail.com>",
   "license": "ISC",
@@ -19,6 +20,7 @@
     "@babel/preset-env": "^7.14.5",
     "@babel/preset-react": "^7.14.5",
     "@babel/preset-typescript": "^7.14.5",
+    "@types/jest": "^26.0.23",
     "@types/react": "^17.0.11",
     "@types/react-dom": "^17.0.8",
     "babel-loader": "^8.2.2",
@@ -26,17 +28,24 @@
     "css-loader": "^5.2.6",
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.3.1",
+    "jest": "^27.0.4",
     "mini-css-extract-plugin": "^1.6.0",
     "postcss-loader": "^6.1.0",
     "postcss-preset-env": "^6.7.0",
     "sass": "^1.35.1",
     "sass-loader": "^12.1.0",
     "style-loader": "^2.0.0",
+    "ts-jest": "^27.0.3",
+    "typescript": "^4.3.4",
     "webpack": "^5.39.1",
     "webpack-cli": "^4.7.2",
     "webpack-dev-server": "^3.11.2"
   },
   "dependencies": {
+    "babylonjs": "^4.2.0",
+    "core-js": "^3.15.0",
+    "mobx": "^6.3.2",
+    "mobx-react-lite": "^3.2.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
   }
