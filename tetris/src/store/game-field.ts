@@ -1,5 +1,7 @@
 import {action, autorun, makeAutoObservable, observable} from "mobx";
-import {Axis, Figure, Vector} from "../assets/types";
+import {Axis, Figure, IFigure, Vector, vectorsAdd} from "../assets/types";
+
+
 
 class GameField {
 	size = {
@@ -8,14 +10,9 @@ class GameField {
 		z: 5
 	}
 
-	figure = {
-		position: [0, 0, 0] as Vector,
-		data: [-
-			[-1, 0, 0],
-			[0, 0, 0],
-			[1, 0, 0],
-			[1, 0, 1]
-		] as Vector[]
+	figure: IFigure = {
+		position: [0, 0, 0],
+		data: []
 	};
 
 	ground: Vector[] = []
@@ -26,7 +23,8 @@ class GameField {
 			setPositionFigure: action.bound,
 			moveFigure: action.bound,
 			rotateFigure: action.bound,
-			createNewFigure: action.bound
+			createNewFigure: action.bound,
+			figureToGround: action.bound
 		})
 	}
 
@@ -43,7 +41,18 @@ class GameField {
 	}
 
 	createNewFigure() {
+		this.figure.data = [
+			[-1, 0, 0],
+			[0, 0, 0],
+			[1, 0, 0],
+			[1, 0, 1]
+		];
+	}
 
+	figureToGround() {
+		for (const cube of this.figure.data) {
+			this.ground.push(vectorsAdd(cube, this.figure.position));
+		}
 	}
 }
 

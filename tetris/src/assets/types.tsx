@@ -30,6 +30,11 @@ export function vectorsAdd(v1: Vector, v2: Vector): Vector {
 const sin = Math.sin;
 const cos = Math.cos;
 
+export interface IFigure {
+    position: Vector,
+    data: Vector[]
+}
+
 export class Figure {
     public position: Vector = [0, 0, 0];
 

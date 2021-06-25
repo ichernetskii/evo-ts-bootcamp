@@ -21,7 +21,10 @@ export class World3d implements IWorld3d {
     private store: ReturnType<typeof useStore>;
 
     public constructor(canvas: HTMLCanvasElement, store: ReturnType<typeof useStore>) {
+        // store
         this.store = store;
+        store.createNewFigure();
+
         const engine = new BABYLON.Engine(canvas);
 
         // create scene
@@ -69,6 +72,7 @@ export class World3d implements IWorld3d {
 
         this.box = this.createBox();
         this.figure = this.createFigure();
+        this.ground = this.createGround();
         // this.material = this.createMaterial("#ff0000");
         // this.material2 = this.createMaterial("#0000ff");
         this.material = new BABYLON.StandardMaterial("NoMaterial", this.scene);
@@ -82,16 +86,17 @@ export class World3d implements IWorld3d {
             // } else {
             //     this.createFigure()
             // }
-            // if (store.figure.position[1] >= -4.5) {
-            //     store.moveFigure(Axis.Y, -0.02);
-            // } else {
-            //     // store.figure.
-            //     // this.createFigure()
-            // }
 
-            this.store.moveFigure(Axis.Y, -0.02);
+            if (store.figure.position[1] >= -4.5) {
+                store.moveFigure(Axis.Y, -0.02);
+            } else {
+                store.figureToGround();
+                store.setPositionFigure([0, 0, 0]);
+                store.createNewFigure();
+            }
 
-            // render
+
+            // render figure
             // this.figure.position = new BABYLON.Vector3(...store.figure.position);
             // this.figure.rotation = new BABYLON.Vector3(...store.figure.rotation);
             // for(const cube of store.figure.data) {
@@ -119,10 +124,13 @@ export class World3d implements IWorld3d {
         //     equals: comparer.structural
         // });
 
+        // update figure
         autorun(() => {
             if (this.figure.length !== this.store.figure.data.length) {
+                this.figure.forEach(f => f.dispose());
                 this.figure = this.createFigure();
             }
+
             this.figure.forEach((cubeScene, idx) => {
                 cubeScene.position = new BABYLON.Vector3(
                     ...vectorsAdd(
@@ -130,6 +138,18 @@ export class World3d implements IWorld3d {
                         this.store.figure.data[idx]
                     )
                 );
+            })
+        });
+
+        // update ground
+        autorun(() => {
+            if (this.ground.length !== this.store.ground.length) {
+                this.ground.forEach(f => f.dispose());
+                this.ground = this.createGround();
+            }
+
+            this.ground.forEach((cubeScene, idx) => {
+                cubeScene.position = new BABYLON.Vector3(...this.store.ground[idx]);
             })
         });
 
@@ -182,23 +202,28 @@ export class World3d implements IWorld3d {
         return box;
     }
 
+    private createCube = (position: Vector): BABYLON.Mesh => {
+        const cube = BABYLON.MeshBuilder.CreateBox("cube", { size: 1 });
+        cube.position = new BABYLON.Vector3(...position);
+        return cube;
+    }
+
     private createFigure(): BABYLON.Mesh[] {
-        const createCube = (position: Vector): BABYLON.Mesh => {
-            const cube = BABYLON.MeshBuilder.CreateBox("cube", { size: 1 });
-            cube.position = new BABYLON.Vector3(...position);
-            return cube;
-        }
         const figure: BABYLON.Mesh[] = [];
         for(const cube of this.store.figure.data) {
-            figure.push(createCube(vectorsAdd(cube, this.store.figure.position)));
+            figure.push(this.createCube(vectorsAdd(cube, this.store.figure.position)));
         }
-        // figure.push(createCube([-1, 0, 0]));
-        // figure.push(createCube([0, 0, 0]));
-        // figure.push(createCube([1, 0, 0]));
-        // figure.push(createCube([1, 0, 1]));
 
-        // return BABYLON.Mesh.MergeMeshes(figure) ?? figure[0];
         return figure;
+    }
+
+    private createGround(): BABYLON.Mesh[] {
+        const ground: BABYLON.Mesh[] = [];
+        for(const cube of this.store.ground) {
+            ground.push(this.createCube(cube));
+        }
+
+        return ground;
     }
 
     private createMaterial(hex: string) {
