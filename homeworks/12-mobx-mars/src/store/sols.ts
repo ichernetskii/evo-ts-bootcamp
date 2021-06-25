@@ -29,6 +29,7 @@ class Sols {
 	constructor() {
 		makeAutoObservable(this, {
 			selectImagesBySol: computed,
+			getFavoriteImages: computed,
 			change: action.bound,
 			toggleFavorite: action.bound,
 			loadImages: flow.bound
@@ -50,6 +51,14 @@ class Sols {
 
 	get selectImagesBySol(): IImage[] {
 		return this.images[this.selectedSol];
+	}
+
+	get getFavoriteImages(): IImage[] {
+		return Object
+			.values(this.images)
+			.reduce((acc, solImages) =>
+				acc.concat(solImages.filter((image: IImage) => this.favorites.includes(image.id))), []
+			);
 	}
 
 	*loadImages(sol: number) {
