@@ -1,6 +1,6 @@
 import {createContext} from "./storeUtils";
-import gameField from "./game-field";
+import gameStore from "./game-store";
 
 export const {StoreProvider, useStore} = createContext({
-	gameField
+	gameStore
 });

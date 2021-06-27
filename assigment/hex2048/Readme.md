@@ -45,7 +45,7 @@ More info:
 
 ## Rules
 
-### Game initialization
+### GameStore initialization
 
 When the game starts on any game level, the first action from the user is not
 expected. That means when you choose the game level or the game is loaded, the
@@ -106,7 +106,7 @@ shifting is completed - do not need to add new numbers. The game has to wait for
 changes in any direction if they are possible and has not been done during
 shifting.
 
-### Game status
+### GameStore status
 
 The game should know a current game status.
 
@@ -115,11 +115,11 @@ Possible game statuses:
 - `playing` - there are possible moves that can be done.
 - `game-over` - there are no more possible moves.
 
-Game status should be present somewhere in your game DOM element (any one DOM
+GameStore status should be present somewhere in your game DOM element (any one DOM
 element at the any place of DOM) as a data attribute `data-status`. Example:
 
 ```html
-<div>Game Status: <span data-status="playing">playing</span></div>
+<div>GameStore Status: <span data-status="playing">playing</span></div>
 ```
 
 ## RNG Server
