@@ -1,6 +1,6 @@
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import MiniCSSExtractPlugin from "mini-css-extract-plugin";
-import {CleanWebpackPlugin} from "clean-webpack-plugin";
+// import {CleanWebpackPlugin} from "clean-webpack-plugin";
 import path from "path";
 const __dirname = path.resolve();
 
@@ -14,7 +14,7 @@ export default (env = {}) => {
             new HtmlWebpackPlugin({
                 template: "./index.html"
             }),
-			new CleanWebpackPlugin()
+			// new CleanWebpackPlugin()
         ];
 
         if (isProd) {
