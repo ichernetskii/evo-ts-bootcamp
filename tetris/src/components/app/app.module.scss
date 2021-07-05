@@ -10,6 +10,13 @@ body {
   text-align: center;
   display: flex;
   flex-flow: column nowrap;
+  align-items: center;
+}
+
+.toolbox {
+  margin-top: 30px;
+  position: absolute;
+  color: #FFF;
 }
 
 canvas {

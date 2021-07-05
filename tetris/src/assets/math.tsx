@@ -4,6 +4,13 @@ export enum Axis {
     Z
 }
 
+export enum IGameState {
+    Playing = "playing",
+    Paused = "paused",
+    Win = "win",
+    Loose = "loose"
+}
+
 export type Vector = [x: number, y: number, z: number];
 export type Matrix = [Vector, Vector, Vector]; // m[x][y]
 
@@ -15,6 +22,103 @@ export interface ICube {
 export interface IFigure {
     position: Vector,
     cubes: ICube[]
+}
+
+export class Figure implements IFigure {
+    position: Vector;
+    cubes: ICube[];
+
+    constructor(position: Vector, cubes: ICube[]) {
+        this.position = roundVector(position);
+        this.cubes = [...cubes];
+    }
+
+    setPosition(position: Vector) {
+        this.position = roundVector(position);
+    }
+
+    move(axis: Axis, length: number) {
+        this.position[axis] += length;
+    }
+
+    rotate(axis: Axis, angle: number) {
+        this.cubes = this.cubes.map(cube => ({
+            ...cube,
+            position: roundVector(vectorRotate(cube.position, axis, angle))
+        }));
+    }
+
+    check = {
+        gameField: (size: Vector, cubeSize: number) => {
+            for(const figureCube of this.cubes) {
+                if (
+                    (Math.abs(this.position[0] + figureCube.position[0]) > (size[0] - cubeSize) / 2) ||
+                    (Math.abs(this.position[2] + figureCube.position[2]) > (size[2] - cubeSize) / 2)
+                ) return false;
+            }
+            return true;
+        },
+        heap: (heap: ICube[], cubeSize: number): boolean => {
+            for(const figureCube of this.cubes) {
+                for(const heapCube of heap) {
+                    const collision = [0, 1, 2].reduce(
+                        (acc, idx) => acc && (
+                            Math.abs(
+                                this.position[idx] + figureCube.position[idx] - heapCube.position[idx]
+                            ) < cubeSize),
+                        true
+                    );
+
+                    if (collision) return false;
+
+                    // if (
+                    // 	(Math.abs(figure.position[0] + figureCube.position[0] - heapCube.position[0]) < this.cubeSize) &&
+                    // 	(Math.abs(figure.position[1] + figureCube.position[1] - heapCube.position[1]) < this.cubeSize) &&
+                    // 	(Math.abs(figure.position[2] + figureCube.position[2] - heapCube.position[2]) < this.cubeSize)
+                    // ) {
+                    // 	return false;
+                    // }
+                }
+            }
+            return true;
+        },
+        ground: (size: Vector, cubeSize: number): boolean => {
+            for(const figureCube of this.cubes) {
+                if (this.position[1] + figureCube.position[1] < -(size[1]/2) + cubeSize / 2) return false;
+            }
+            return true;
+        }
+    }
+}
+
+/**
+ * Rounds value by specific step
+ * @param {number} value Value to be rounded
+ * @param {number} step Step of round
+ * @example
+ * round(2.74, 0.1) = 2.7
+ * round(2.74, 0.5) = 2.5
+ * round(2.74, 1.0) = 3
+ */
+export function round(value: number, step: number = 0.5): number {
+    let inv = 1.0 / step;
+    return Math.round(value * inv) / inv;
+}
+
+/**
+ * Rounds vector coordinates by specific step
+ * @param vector Vector to be rounded
+ * @param step Step of round
+ */
+export function roundVector(vector: Vector, step: number = 0.5): Vector {
+    return vector.map(v => round(v)) as Vector;
+}
+
+export const randomHEXColor = (): string => "#" + Math.floor(Math.random()*16777215).toString(16);
+
+// min and max included
+export function randomIntFromInterval(min: number, max: number): number {
+    return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
 export function matrixMultiplyVector(m: Matrix, v: Vector): Vector {
@@ -31,12 +135,40 @@ export function matrixMultiplyVector(m: Matrix, v: Vector): Vector {
 
 export function vectorPlusVector(v1: Vector, v2: Vector): Vector {
     return [
-        Math.round(v1[0] + v2[0]),
+        v1[0] + v2[0],
         v1[1] + v2[1],
-        Math.round(v1[2] + v2[2])
+        v1[2] + v2[2]
     ];
 }
 
 export function getMinYFigure(figure: IFigure) {
     return figure.position[1] + Math.min(...figure.cubes.map(cube => cube.position[1]));
+}
+
+/**
+ * Rotates vector
+ *
+ * @param {Vector} vector Vector to be rotated
+ * @param {Axis} axis Axis-rotation
+ * @param {number} angle Angle of rotation in degrees
+ */
+export function vectorRotate(vector: Vector, axis: Axis, angle: number): Vector {
+    const sin = Math.sin;
+    const cos = Math.cos;
+    const a = Math.PI * (angle / 180);
+    let rotationMatrix: Matrix;
+
+    switch (axis) {
+        case Axis.X:
+            rotationMatrix = [[1, 0, 0], [0, cos(a), sin(a)], [0, -sin(a), cos(a)]];
+            break;
+        case Axis.Y:
+            rotationMatrix = [[cos(a), 0, -sin(a)], [0, 1, 0], [sin(a), 0, cos(a)]];
+            break;
+        case Axis.Z:
+            rotationMatrix = [[cos(a), sin(a), 0], [-sin(a), cos(a), 0], [0, 0, 1]];
+            break;
+    }
+
+    return matrixMultiplyVector(rotationMatrix, vector);
 }

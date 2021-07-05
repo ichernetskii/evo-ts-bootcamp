@@ -1,0 +1,105 @@
+@import "src/style/variables.scss";
+@import "src/style/mixins.scss";
+
+$animation-time:        0.4s;
+
+.form-cta {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: -1;
+  background-color: rgba(0, 0, 0, 0);
+  transition:
+          background-color $animation-time linear,
+          z-index          $animation-time linear;
+
+  .form {
+    position: absolute;
+    box-sizing: border-box;
+    border-radius: 20px;
+    width: 90%;
+    height: 90%;
+    max-width: 500px;
+    max-height: 420px;
+    padding: 20px;
+    opacity: 1;
+    background-color: $color-bg;
+    right: 0;
+    transform: translateX(100%) translateY(-50%);
+    top: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition:
+            right     $animation-time cubic-bezier(0.34, 1.56, 0.64, 1),
+            transform $animation-time cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    @include media-styles("xs") {
+      padding: 20px;
+      max-height: 320px;
+      max-width: 360px;
+    }
+
+    & > * {
+      margin-bottom: 15px;
+    }
+
+    &__close {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      overflow: hidden;
+      font-size: 70px;
+      font-weight: 300;
+      margin-bottom: 0;
+      line-height: 0.5em;
+      cursor: pointer;
+      color: #F9F9F9;
+      user-select: none;
+      text-shadow: 1px 1px 4px rgba(159, 176, 191, 0.67);
+
+      &:hover {
+        text-shadow: 0 0 3px rgba(159, 176, 191, 0.67);
+      }
+    }
+
+    &__header {
+      font-size: $font-size-h1;
+      font-weight: $font-weight-bold;
+      margin-bottom: 30px;
+      text-align: center;
+
+      @include media-styles("xs") {
+        margin-top: 20px;
+        margin-bottom: 10px;
+        font-size: $font-size-h4;
+      }
+    }
+
+    &__description {
+      color: $color-text-unactive;
+      font-size: $font-size-h5;
+      text-align: center;
+    }
+
+    &__line {
+      margin: 10px 0;
+      font-weight: $font-weight-bold;
+    }
+  }
+
+  &_visible {
+    z-index: 200;
+    background-color: rgba(0, 0, 0, 0.5);
+
+    .form {
+      right: 50%;
+      transform: translateX(50%) translateY(-50%);
+    }
+  }
+}
+
+
