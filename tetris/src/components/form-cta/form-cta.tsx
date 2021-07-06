@@ -22,10 +22,11 @@ const FormCta: React.FC<{}> = observer(() => {
                 <div className={s["form__close"]} onClick={close}>&times;</div>
                 <header className={s["form__header"]}>Управление</header>
                 <div className={s["form__description"]}>
-                    <div className={s["form__line"]}>rotate X: Num+7, Num+4</div>
-                    <div className={s["form__line"]}>rotate Y: Num+8, Num+5</div>
-                    <div className={s["form__line"]}>rotate Z: Num+9, Num+6</div>
-                    <div className={s["form__line"]}>move: ←, →, ↑, ↓</div>
+                    <div className={s["form__line"]}>rotate X:  Num+7, Num+4</div>
+                    <div className={s["form__line"]}>rotate Y:  Num+8, Num+5</div>
+                    <div className={s["form__line"]}>rotate Z:  Num+9, Num+6</div>
+                    <div className={s["form__line"]}>move:      ←, →, ↑, ↓</div>
+                    <div className={s["form__line"]}>speed-up:  space</div>
                 </div>
             </div>
         </div>
