@@ -40,7 +40,7 @@ export class World3d {
             }
         });
 
-        // update figure (store → scene )
+        // update figure (store → scene)
         reaction(() => toJS(this.store.figure),
             (figure, prevFigure) => {
                 if (figure.cubes.length !== prevFigure.cubes.length) {
@@ -57,7 +57,7 @@ export class World3d {
             }
         );
 
-        // update heap (store → scene )
+        // update heap (store → scene)
         reaction(() => toJS(this.store.heap),
             (heap, prevHeap) => {
             if (heap.length !== prevHeap.length) {
@@ -71,7 +71,7 @@ export class World3d {
             }
         );
 
-        // update gameField (store → gameField )
+        // update gameField & ground (store → gameField, ground)
         reaction(() => toJS(this.store.size), () => {
             this.ground.dispose();
             this.ground = this.createGround();
