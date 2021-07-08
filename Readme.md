@@ -1,7 +1,8 @@
 # TypeScript Bootcamp
 
-#Homeworks (with live demo):
-https://github.com/smartopro/evo-ts-bootcamp
+## Homeworks (with live demo):
+
+[https://github.com/smartopro/evo-ts-bootcamp](https://github.com/smartopro/evo-ts-bootcamp)
 
 This repository contains information on the [Evolution Gaming](https://eng.evolutiongaming.com/) TypeScript Bootcamp.
 
