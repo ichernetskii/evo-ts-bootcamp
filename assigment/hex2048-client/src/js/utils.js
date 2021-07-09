@@ -1,3 +1,6 @@
+import getRNGPoints from "./fieldUtils";
+import {servers} from "./config";
+
 export async function request(url, body = null, method = "POST", headers = {}) {
     if (body) {
         body = JSON.stringify(body);
@@ -144,7 +147,10 @@ export const fetchNewData = async (data, server, radius) => {
 
     // filter empty items
     const filteredRequest = result.filter(r => r.value);
-    const response = await request(`${server}/${radius}`, filteredRequest);
+
+    const response = server === servers.localdata
+        ? getRNGPoints(radius, filteredRequest)
+        : await request(`${server}/${radius}`, filteredRequest);
 
     data.forEach(item => delete item.appeared);
 

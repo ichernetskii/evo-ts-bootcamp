@@ -29,7 +29,7 @@ function App() {
     const [data, setData] = useState([]);
     const [radius, setRadius] = useState(2);
     const [gameStatus, setGameStatus] = useState("initial");
-    const [server, setServer] = useState(servers.local);
+    const [server, setServer] = useState(servers.localdata);
     const [isGameFieldLoading, setGameFieldLoading] = useState(false);
     const ref = useRef(null);
 
@@ -148,7 +148,8 @@ function App() {
                         }
                     </select>
                 </div>
-                <select id="url-server" defaultValue={servers.local} styleName="select select_server" onChange={e => setServer(e.target.value)}>
+                <select id="url-server" defaultValue={servers.localdata} styleName="select select_server" onChange={e => setServer(e.target.value)}>
+                    <option id="localdata" value={servers.localdata}>Local data</option>
                     <option id="remote" value={servers.remote}>Remote server</option>
                     <option id="localhost" value={servers.local}>Local server</option>
                 </select>
