@@ -177,15 +177,15 @@ const App = observer(() => {
 				</div>
 				<p>Control:</p>
 				<List>
-					<li>Left: pause/resume</li>
-					<li>Left + Move: move</li>
-					<li>Zoom</li>
+					<li>Left mouse btn: pause/resume</li>
+					<li>Left mouse btn + mouse move: move</li>
+					<li>Mouse scroll: zoom</li>
 				</List>
 				<p>When paused:</p>
 				<List>
-					<li>Right: add/delete</li>
-					<li>Right + Move: add many</li>
-					<li>Left + Right + Move: delete many</li>
+					<li>Right mouse btn: add/delete</li>
+					<li>Right mouse btn + mouse move: add many</li>
+					<li>Left+right mouse btn + mouse move: delete many</li>
 
 				</List>
 			</Toolbar>
