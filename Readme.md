@@ -7,7 +7,7 @@ Game control: ↖ Q, ↑ W, ↗ E, ↙ A, ↓ S, ↘ D
 
 ## Homeworks (with live demos):
 
-[https://github.com/smartopro/evo-ts-bootcamp](https://github.com/smartopro/evo-ts-bootcamp)
+[https://github.com/smartopro/evo-ts-bootcamp/tree/master/homeworks](https://github.com/smartopro/evo-ts-bootcamp/tree/master/homeworks)
 
 This repository contains information on the [Evolution Gaming](https://eng.evolutiongaming.com/) TypeScript Bootcamp.
 
