@@ -1,6 +1,11 @@
 # TypeScript Bootcamp
 
-## Homeworks (with live demo):
+## Hexagon 2048 game
+
+Game live: [hexagon2048.netlify.app](http://hexagon2048.netlify.app)<br/>
+Game control: ↖ Q, ↑ W, ↗ E, ↙ A, ↓ S, ↘ D
+
+## Homeworks (with live demos):
 
 [https://github.com/smartopro/evo-ts-bootcamp](https://github.com/smartopro/evo-ts-bootcamp)
 

@@ -81,28 +81,28 @@ function App() {
             return;
         }
 
-        switch (e.key.toUpperCase()) {
-            case "W":
+        switch (e.keyCode) {
+            case 87: // W
                 direction = "x";
                 up = true;
                 break;
-            case "S":
+            case 83: // S
                 direction = "x";
                 up = false;
                 break;
-            case "Q":
+            case 81: // Q
                 direction = "z";
                 up = true;
                 break;
-            case "D":
+            case 68: // D
                 direction = "z";
                 up = false;
                 break;
-            case "E":
+            case 69: // E
                 direction = "y";
                 up = false;
                 break;
-            case "A":
+            case 65: // A
                 direction = "y";
                 up = true;
                 break;
