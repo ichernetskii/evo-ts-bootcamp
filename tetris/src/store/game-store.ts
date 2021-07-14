@@ -1,25 +1,19 @@
 import {action, makeAutoObservable, observable} from "mobx";
 import {
 	Axis,
-	Figure,
-	ICube,
-	IFigure,
-	IGameState,
+	Vector,
 	randomIntFromInterval,
 	roundVector,
-	Vector,
 	vectorPlusVector
-} from "../assets/math";
+} from "../classes/math";
+import {IFigure, Figure} from "../classes/figure";
+import {ICube} from "../classes/cube";
+import {figures, colors} from "./figures";
+import {IGameState} from "../classes/game-state";
 
 class GameStore {
-	readonly colors: string[] = ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF"];
-	readonly figures: Vector[][] = [
-		[[-1, 0, 0], [0, 0, 0], [1, 0, 0], [1, 0, 1]],
-		[[-1, 0, 0], [0, 0, 0], [1, 0, 0], [0, 0, 1]],
-		[[0, 0, 0]],
-		[[-1, 0, 0], [0, 0, 0], [1, 0, 0], [2, 0, 0]],
-		[[-1, 0, 0], [0, 0, 0], [0, 0, 1], [1, 0, 1]]
-	];
+	readonly colors: string[] = colors;
+	readonly figures: Vector[][] = figures;
 	readonly dy = 1;
 	readonly cubeSize = 1;
 

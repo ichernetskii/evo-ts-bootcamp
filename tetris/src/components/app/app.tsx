@@ -1,11 +1,16 @@
 import * as React from "react";
 import {useLayoutEffect} from "react";
+import {reaction, toJS} from "mobx";
 import {observer} from "mobx-react-lite";
-import {World3d} from "../../assets/world3d";
-import {useStore} from "../../store/store";
-import {Axis, IGameState} from "../../assets/math";
-import s from  "./app.module.scss";
 import FormCta from "../form-cta/form-cta";
+import {World3d} from "../../classes/world3d";
+import {Axis, vectorPlusVector} from "../../classes/math";
+import {useStore} from "../../store/store";
+import {createPublisher} from "../../classes/observer";
+import {IFigure} from "../../classes/figure";
+import {ICube} from "../../classes/cube";
+import s from  "./app.module.scss";
+import {IGameState} from "../../classes/game-state";
 
 const App: React.FC = observer(() => {
     const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
@@ -13,10 +18,62 @@ const App: React.FC = observer(() => {
     const gameStore = useStore("gameStore");
     const appStore = useStore("appStore");
 
+    const publisherStore = createPublisher({
+        createNewFigure: gameStore.createNewFigure,
+        getState: () => gameStore,
+        getFigure: () => gameStore.figure,
+        getHeap: () => gameStore.heap,
+    });
+
     useLayoutEffect(() => {
         if (canvasRef.current) {
             canvasRef.current.focus();
-            world3d.current = new World3d(canvasRef.current, gameStore);
+            world3d.current = new World3d(canvasRef.current, gameStore, publisherStore);
+
+            // update figure (store → scene)
+            reaction(
+                () => toJS(publisherStore.get("getFigure")),
+                (figure, prevFigure) => {
+                    if (figure.cubes.length !== prevFigure.cubes.length) {
+                        world3d.current?.publisher3D.dispatch("rerenderFigure");
+                    }
+                    figure.cubes.forEach((cubeStore, idx) => {
+                        world3d.current?.publisher3D.dispatch(
+                            "updateFigure",
+                            idx,
+                            vectorPlusVector(figure.position, cubeStore.position),
+                            cubeStore.color
+                        );
+                    });
+                }
+            );
+
+            // update heap (store → scene)
+            reaction(
+                () => toJS(publisherStore.get("getHeap")),
+                (heap, prevHeap) => {
+                    if (heap.length !== prevHeap.length) {
+                        world3d.current?.publisher3D.dispatch("rerenderHeap");
+                    }
+                    heap.forEach((cubeStore, idx) => {
+                        world3d.current?.publisher3D.dispatch(
+                            "updateHeap",
+                            idx,
+                            cubeStore.position,
+                            cubeStore.color
+                        );
+                    });
+                }
+            );
+
+            // update gameField & ground (store → gameField, ground)
+            reaction(
+                () => toJS(publisherStore.get("getState").size),
+                () => {
+                    world3d.current?.publisher3D.dispatch("rerenderGround");
+                    world3d.current?.publisher3D.dispatch("rerenderGameField");
+                }
+            )
         }
     }, []);
 

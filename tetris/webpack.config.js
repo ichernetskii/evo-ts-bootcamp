@@ -83,7 +83,9 @@ export default (env = {}) => {
             extensions: [".js", ".jsx", ".ts", ".tsx", ".json"],
 			alias: {
 				"@": path.resolve(__dirname, "src"),
-				"components": path.resolve(__dirname, "src", "components")
+				"components": path.resolve(__dirname, "src", "components"),
+				"classes": path.resolve(__dirname, "src", "classes"),
+				"store": path.resolve(__dirname, "src", "store")
 			}
         },
         output: {

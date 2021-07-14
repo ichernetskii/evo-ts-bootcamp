@@ -1,7 +1,36 @@
 import * as BABYLON from "babylonjs";
-import {Axis, ICube, IGameState, vectorPlusVector} from "./math";
-import {reaction, toJS} from "mobx";
+import {Axis, Vector, vectorPlusVector} from "./math";
+import {ICube} from "./cube";
 import gameStore from "./../store/game-store";
+import {createPublisher} from "./observer";
+import {IGameState} from "./game-state";
+
+enum KeyboardKeys {
+    Space = 32,
+    Left = 37,
+    Up = 38,
+    Right = 39,
+    Down = 40,
+    A = 65,
+    D = 68,
+    E = 69,
+    Q = 81,
+    S = 83,
+    W = 87
+}
+
+const GROUND_MATERIAL = "#009900";
+const GAMEFIELD_COLOR = [255, 255, 255, 0.2];
+const GAMEFIELD_WIDTH = 4.0;
+const LIGHT = {
+    POSITION: [2, 20, 2],
+    INTENSITY: 1
+}
+const CAMERA = {
+    ALPHA: 5*Math.PI/32,
+    BETA: 11*Math.PI/32,
+    RADIUS: 20
+}
 
 export class World3d {
     private readonly coloredMaterials: {
@@ -16,20 +45,64 @@ export class World3d {
     private figure: BABYLON.Mesh[];
     private heap: BABYLON.Mesh[];
     private start: number;
+    public publisher3D = createPublisher({
+        getFigure: () => this.figure,
+        setFigure: (figure: BABYLON.Mesh[]) => { this.figure = figure },
+        rerenderFigure: () => this.rerenderFigure(),
+        updateFigure: (idx: number, position: Vector, material: string) => { this.updateFigure(idx, position, material) },
+        rerenderHeap: () => this.rerenderHeap(),
+        updateHeap: (idx: number, position: Vector, material: string) => { this.updateHeap(idx, position, material) },
+        rerenderGround: () => this.rerenderGround(),
+        rerenderGameField: () => this.rerenderGameField()
+    });
 
-    public constructor(canvas: HTMLCanvasElement, store: typeof gameStore) {
+    rerenderFigure() {
+        this.figure.forEach(f => f.dispose());
+        this.figure = this.createFigureFromState();
+    }
+
+    rerenderHeap() {
+        this.heap.forEach(f => f.dispose());
+        this.heap = this.createHeapFromState();
+    }
+
+    updateFigure(idx: number, position: Vector, material: string) {
+        this.figure[idx].position = new BABYLON.Vector3(...position);
+        this.figure[idx].material = this.coloredMaterials[material];
+    }
+
+    updateHeap(idx: number, position: Vector, material: string) {
+        this.heap[idx].position = new BABYLON.Vector3(...position);
+        this.heap[idx].material = this.coloredMaterials[material]
+    }
+
+    rerenderGround() {
+        this.ground.dispose();
+        this.ground = this.createGround();
+    }
+
+    rerenderGameField() {
+        this.gameField.dispose();
+        this.gameField = this.createGameField();
+    }
+
+    public constructor(canvas: HTMLCanvasElement, store: typeof gameStore, publisherStore: ReturnType<typeof createPublisher>) {
         const engine = new BABYLON.Engine(canvas);
         this.store = store;
         this.scene = new BABYLON.Scene(engine);
         this.camera = this.createCamera(canvas);
         this.light = this.createLight();
-        this.coloredMaterials = Object.fromEntries(this.store.colors.map(color => [color, this.createMaterial(color)]));
+        this.coloredMaterials = Object.fromEntries((publisherStore.get("getState").colors).map(color => [color, this.createMaterial(color)]));
         this.ground = this.createGround();
         this.gameField = this.createGameField();
-        this.store.createNewFigure();
+        publisherStore.dispatch("createNewFigure");
         this.figure = this.createFigureFromState();
         this.heap = this.createHeapFromState();
         this.start = Date.now().valueOf();
+
+        canvas.addEventListener("resize", () => {
+            engine.resize();
+        });
 
         this.scene.registerBeforeRender(() => {
             const progress = Date.now().valueOf() - this.start;
@@ -40,45 +113,6 @@ export class World3d {
             }
         });
 
-        // update figure (store → scene)
-        reaction(() => toJS(this.store.figure),
-            (figure, prevFigure) => {
-                if (figure.cubes.length !== prevFigure.cubes.length) {
-                    this.figure.forEach(f => f.dispose());
-                    this.figure = this.createFigureFromState();
-                }
-
-                figure.cubes.forEach((cubeStore, idx) => {
-                    this.figure[idx].position = new BABYLON.Vector3(
-                        ...vectorPlusVector(figure.position, figure.cubes[idx].position)
-                    );
-                    this.figure[idx].material = this.coloredMaterials[figure.cubes[idx].color]
-                });
-            }
-        );
-
-        // update heap (store → scene)
-        reaction(() => toJS(this.store.heap),
-            (heap, prevHeap) => {
-            if (heap.length !== prevHeap.length) {
-                this.heap.forEach(f => f.dispose());
-                this.heap = this.createHeapFromState();
-            }
-                heap.forEach((cubeStore, idx) => {
-                    this.heap[idx].position = new BABYLON.Vector3(...heap[idx].position);
-                    this.heap[idx].material = this.coloredMaterials[heap[idx].color]
-                })
-            }
-        );
-
-        // update gameField & ground (store → gameField, ground)
-        reaction(() => toJS(this.store.size), () => {
-            this.ground.dispose();
-            this.ground = this.createGround();
-            this.gameField.dispose();
-            this.gameField = this.createGameField();
-        })
-
         this.scene.onKeyboardObservable.add((kbInfo) => {
             if (store.gameState === IGameState.Playing) {
                 switch (kbInfo.type) {
@@ -86,47 +120,47 @@ export class World3d {
                         // console.log("KEY DOWN: ", kbInfo.event.key);
                         switch (kbInfo.event.keyCode) {
                             // up
-                            case 38:
+                            case KeyboardKeys.Up:
                                 this.store.moveFigure(Axis.X, -1);
                                 break;
                             // down
-                            case 40:
+                            case KeyboardKeys.Down:
                                 this.store.moveFigure(Axis.X, 1);
                                 break;
                             // right
-                            case 39:
+                            case KeyboardKeys.Right:
                                 this.store.moveFigure(Axis.Z, 1);
                                 break;
                             // left
-                            case 37:
+                            case KeyboardKeys.Left:
                                 this.store.moveFigure(Axis.Z, -1);
                                 break;
                             // space
-                            case 32:
+                            case KeyboardKeys.Space:
                                 this.store.delay.current = this.store.delay.fast;
                                 break;
-                            // Num 7: rotate +X
-                            case 103:
+                            // rotate +X
+                            case KeyboardKeys.Q:
                                 this.store.rotateFigure(Axis.X, 90);
                                 break;
-                            // Num 4: rotate -X
-                            case 100:
+                            // rotate -X
+                            case KeyboardKeys.A:
                                 this.store.rotateFigure(Axis.X, -90);
                                 break;
-                            // Num 8: rotate +Y
-                            case 104:
+                            // rotate +Y
+                            case KeyboardKeys.W:
                                 this.store.rotateFigure(Axis.Y, 90);
                                 break;
-                            // Num 5: rotate -Y
-                            case 101:
+                            // rotate -Y
+                            case KeyboardKeys.S:
                                 this.store.rotateFigure(Axis.Y, -90);
                                 break;
-                            // Num 9: rotate +Z
-                            case 105:
+                            // rotate +Z
+                            case KeyboardKeys.E:
                                 this.store.rotateFigure(Axis.Z, 90);
                                 break;
-                            // Num 6: rotate -Z
-                            case 102:
+                            // rotate -Z
+                            case KeyboardKeys.D:
                                 this.store.rotateFigure(Axis.Z, -90);
                                 break;
                         }
@@ -134,7 +168,7 @@ export class World3d {
                     case BABYLON.KeyboardEventTypes.KEYUP:
                         // console.log("KEY UP: ", kbInfo.event.keyCode);
                         switch (kbInfo.event.keyCode) {
-                            case 32:
+                            case KeyboardKeys.Space:
                                 this.store.delay.current = this.store.delay.normal;
                                 break;
                         }
@@ -152,9 +186,9 @@ export class World3d {
     private createCamera(canvas: HTMLCanvasElement): BABYLON.ArcRotateCamera {
         const camera = new BABYLON.ArcRotateCamera(
             "camera",
-            Math.PI/8,
-            7*Math.PI/16,
-            20,
+            CAMERA.ALPHA,
+            CAMERA.BETA,
+            CAMERA.RADIUS,
             BABYLON.Vector3.Zero(),
             this.scene
         );
@@ -166,10 +200,10 @@ export class World3d {
     private createLight(): BABYLON.HemisphericLight {
         const light = new BABYLON.HemisphericLight(
             "HemiLight",
-            new BABYLON.Vector3(2, 20, 2),
+            new BABYLON.Vector3(...LIGHT.POSITION),
             this.scene
         );
-        light.intensity = 1;
+        light.intensity = LIGHT.INTENSITY;
         return light;
     }
 
@@ -181,8 +215,8 @@ export class World3d {
         });
         box.position = BABYLON.Vector3.Zero();
         box.enableEdgesRendering();
-        box.edgesWidth = 4.0;
-        box.edgesColor = new BABYLON.Color4(255, 255, 255, 0.2);
+        box.edgesWidth = GAMEFIELD_WIDTH;
+        box.edgesColor = new BABYLON.Color4(...GAMEFIELD_COLOR);
 
         const glassMaterial = new BABYLON.StandardMaterial("Glass", this.scene);
         glassMaterial.alpha = 0;
@@ -207,7 +241,7 @@ export class World3d {
             this.scene
         );
 
-        groundMaterial.diffuseColor = BABYLON.Color3.FromHexString("#009900");
+        groundMaterial.diffuseColor = BABYLON.Color3.FromHexString(GROUND_MATERIAL);
         groundMaterial.backFaceCulling = false;
         ground.material = groundMaterial;
 
