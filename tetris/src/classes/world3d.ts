@@ -1,5 +1,5 @@
 import * as BABYLON from "babylonjs";
-import {Axis, Vector, vectorPlusVector} from "./math";
+import {Axis, vectorPlusVector} from "./math";
 import {ICube} from "./cube";
 import {IListeners, Publisher} from "./observer";
 import {IGameState} from "./game-state";

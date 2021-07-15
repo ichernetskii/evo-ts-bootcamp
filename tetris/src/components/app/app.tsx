@@ -7,9 +7,9 @@ import {World3d} from "../../classes/world3d";
 import {Publisher} from "../../classes/observer";
 import useMobX from "../../classes/observer.MobX";
 import {IGameState} from "../../classes/game-state";
-import s from  "./app.module.scss";
 import {Axis} from "../../classes/math";
 import {useSwipeable} from "react-swipeable";
+import s from  "./app.module.scss";
 
 const App: React.FC = observer(() => {
     const {storeConfig, init} = useMobX();
