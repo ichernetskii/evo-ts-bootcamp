@@ -3,6 +3,13 @@
 
 $animation-time:        0.4s;
 
+/* Show arrows for numeric input */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  opacity: 1;
+}
+
 .form-cta {
   position: fixed;
   left: 0;
@@ -25,7 +32,7 @@ $animation-time:        0.4s;
     max-height: 420px;
     padding: 20px;
     opacity: 1;
-    background-color: $color-bg;
+    background-color: #C6C6C6;
     right: 0;
     transform: translateX(100%) translateY(-50%);
     top: 50%;
@@ -71,6 +78,7 @@ $animation-time:        0.4s;
       font-weight: $font-weight-bold;
       margin-bottom: 30px;
       text-align: center;
+      color: #000;
 
       @include media-styles("xs") {
         margin-top: 20px;
@@ -80,7 +88,6 @@ $animation-time:        0.4s;
     }
 
     &__description {
-      color: $color-text-unactive;
       font-size: $font-size-h5;
       text-align: center;
     }
@@ -88,6 +95,7 @@ $animation-time:        0.4s;
     &__line {
       margin: 10px 0;
       font-weight: $font-weight-bold;
+      color: #000;
     }
   }
 
@@ -98,6 +106,30 @@ $animation-time:        0.4s;
     .form {
       right: 50%;
       transform: translateX(50%) translateY(-50%);
+    }
+  }
+}
+
+.toolbox {
+  width: 300px;
+  display: flex;
+  justify-content: center;
+
+  & label {
+    margin-right: 10px;
+    color: #000;
+
+    input {
+      height: 1.6em;
+      width: 40px;
+      margin-top: -4px;
+      position: relative;
+      top: -1px;
+      color: #000;
+    }
+
+    &:last-child {
+      margin-right: 0;
     }
   }
 }

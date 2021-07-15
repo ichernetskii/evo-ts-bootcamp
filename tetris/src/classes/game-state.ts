@@ -1,6 +1,6 @@
 export enum IGameState {
-    Playing = "playing",
-    Paused = "paused",
-    Win = "win",
-    Loose = "loose"
+    Playing = "Playing",
+    Paused = "Paused",
+    Win = "Win",
+    Loose = "Loose"
 }

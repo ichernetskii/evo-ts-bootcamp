@@ -1,6 +1,7 @@
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import MiniCSSExtractPlugin from "mini-css-extract-plugin";
 // import {CleanWebpackPlugin} from "clean-webpack-plugin";
+import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
 import path from "path";
 const __dirname = path.resolve();
 
@@ -88,6 +89,15 @@ export default (env = {}) => {
 				"store": path.resolve(__dirname, "src", "store")
 			}
         },
+		optimization: {
+			splitChunks: {
+				chunks: isProd ? "all" : "async"
+			},
+			minimizer: [
+				`...`,
+				new CssMinimizerPlugin()
+			]
+		},
         output: {
             filename: "bundle.js",
             path: path.resolve(__dirname, "dist"),
@@ -121,7 +131,21 @@ export default (env = {}) => {
                 {
                     test: /\.module\.s[ca]ss$/,
                     use: cssLoaders("sass-loader", true)
-                }
+                },
+				// Loading fonts
+				{
+					test: /fonts.*\.(ttf|otf|eot|woff2?|svg)$/,
+					use: [
+						{
+							loader: "file-loader",
+							options: {
+								name: "[path][name].[ext]",
+								publicPath: isProd ? "../" : "",
+								esModule: false
+							}
+						}
+					]
+				},
             ],
         },
     }

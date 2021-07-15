@@ -8,6 +8,7 @@ const figures: Vector[][] = [
     [[-1, 0, 0], [0, 0, 0], [0, 0, 1], [1, 0, 1]]
 ];
 
-const colors: string[] = ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF"];
+const colors: string[] = ["#e2504d", "#e77a04", "#dba825", "#8abd2b",
+    "#2375ec", "#35d0d7", "#8444b1"];
 
 export {figures, colors};

@@ -1,6 +1,6 @@
 // Fonts
 
-$font-family-base:              arial, sans-serif;
+$font-family-base:              "GothamPro", arial, sans-serif;
 
 $font-weight-thin:              100;
 $font-weight-extra-light:       200;
@@ -35,9 +35,9 @@ $font-size-h6-small:            0.75 * $font-size-base; // ~14px
 
 $color-accent:                  #FF6400;
 $color-accent-2:                #2396FF;
-$color-text:                    #343341;
+$color-text:                    #FFF;
 $color-text-selection:          transparentize($color-accent, 0.35);
 $color-bg:                      #F9F9F9;
-$color-text-unactive:           #AAA;
+$color-text-unactive:           #888;
 $color-error:                   #F44;
 

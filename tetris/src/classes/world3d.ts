@@ -90,7 +90,6 @@ export class World3d {
             if (this.publisherStore.get("getState").gameState === IGameState.Playing) {
                 switch (kbInfo.type) {
                     case BABYLON.KeyboardEventTypes.KEYDOWN:
-                        // console.log("KEY DOWN: ", kbInfo.event.key);
                         switch (kbInfo.event.keyCode) {
                             // up
                             case KeyboardKeys.Up:
@@ -139,7 +138,6 @@ export class World3d {
                         }
                         break;
                     case BABYLON.KeyboardEventTypes.KEYUP:
-                        // console.log("KEY UP: ", kbInfo.event.keyCode);
                         switch (kbInfo.event.keyCode) {
                             case KeyboardKeys.Space:
                                 this.publisherStore.dispatch("setDelay")(this.publisherStore.get("getState").delay.normal);
@@ -221,7 +219,9 @@ export class World3d {
             this.scene
         );
         camera.attachControl(canvas, true);
+        camera.inputs.remove(camera.inputs.attached.pointers);
         camera.inputs.remove(camera.inputs.attached.keyboard);
+        camera.inputs.remove(camera.inputs.attached.mousewheel);
         return camera;
     }
 
@@ -280,6 +280,7 @@ export class World3d {
         const cubeScene = BABYLON.MeshBuilder.CreateBox("cube", { size: this.publisherStore.get("getState").cubeSize });
         cubeScene.position = new BABYLON.Vector3(...cube.position);
         cubeScene.material = this.coloredMaterials[(transparent ? "T" : "") + cube.color];
+        // cubeScene.material.transparencyMode = BABYLON.Material.MATERIAL_ALPHABLEND;
         return cubeScene;
     }
 
@@ -316,7 +317,7 @@ export class World3d {
     private createMaterial(hex: string, transparent = false) {
         const material = new BABYLON.StandardMaterial(`coloredMaterial:${hex}`, this.scene);
         material.diffuseColor = BABYLON.Color3.FromHexString(hex);
-        if (transparent) material.alpha = 0.5;
+        if (transparent) material.alpha = 0.4;
         return material;
     }
 

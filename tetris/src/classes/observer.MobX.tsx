@@ -1,6 +1,7 @@
 import {reaction, toJS} from "mobx";
 import {useStore} from "../store/store";
 import {IListeners, Publisher} from "./observer";
+import {IGameState} from "./game-state";
 
 const useMobX = () => {
     const gameStore = useStore("gameStore");
@@ -12,6 +13,7 @@ const useMobX = () => {
             deleteLevels: gameStore.deleteLevels,
             rotateFigure: gameStore.rotateFigure,
             setDelay: (delay: typeof gameStore.delay.current) => gameStore.delay.current = delay,
+            startGame: () => gameStore.gameState = IGameState.Playing,
             getState: () => gameStore,
             getFigure: () => gameStore.figure,
             getFinalFigure: () => gameStore.finalFigure,
