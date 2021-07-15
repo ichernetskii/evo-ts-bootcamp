@@ -6,7 +6,7 @@ body {
 
 .app {
   width: 100vw;
-  height: 100vh;
+  height: 100%;
   position: absolute;
   text-align: center;
   display: flex;
@@ -39,9 +39,11 @@ body {
     user-select: none;
     border-radius: 5px;
 
-    &:hover {
-      background-color: #AAA;
-      color: #FFF;
+    @media (hover: hover) {
+      &:hover {
+        background-color: #AAA;
+        color: #FFF;
+      }
     }
   }
 }

@@ -101,7 +101,6 @@ export default (env = {}) => {
         output: {
             filename: "[name].[fullhash:8].js",
             path: path.resolve(__dirname, "build"),
-			sourceMapFilename: "[name].[fullhash:8].map",
 			chunkFilename: "[id].[fullhash:8].js"
         },
 		target: isProd ? "browserslist" : "web", // disable browserslist for development
