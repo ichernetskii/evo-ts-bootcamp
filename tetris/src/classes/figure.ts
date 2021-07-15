@@ -30,6 +30,17 @@ export class Figure implements IFigure {
         }));
     }
 
+    getFinalFigurePosition(heap: ICube[], gameFieldSize: Vector, cubeSize: number, dy: number): Vector {
+        const finalFigure = new Figure(this.position, this.cubes);
+        finalFigure.position[1] -= dy;
+        while (finalFigure.check.heap(heap, cubeSize) && finalFigure.check.ground(gameFieldSize, cubeSize)) {
+            finalFigure.position[1] -= dy;
+        }
+        finalFigure.position[1] += dy;
+        return finalFigure.position;
+    }
+
+    // return true if NO collision
     check = {
         gameField: (size: Vector, cubeSize: number) => {
             for(const figureCube of this.cubes) {
@@ -52,21 +63,13 @@ export class Figure implements IFigure {
                     );
 
                     if (collision) return false;
-
-                    // if (
-                    // 	(Math.abs(figure.position[0] + figureCube.position[0] - heapCube.position[0]) < this.cubeSize) &&
-                    // 	(Math.abs(figure.position[1] + figureCube.position[1] - heapCube.position[1]) < this.cubeSize) &&
-                    // 	(Math.abs(figure.position[2] + figureCube.position[2] - heapCube.position[2]) < this.cubeSize)
-                    // ) {
-                    // 	return false;
-                    // }
                 }
             }
             return true;
         },
-        ground: (size: Vector, cubeSize: number): boolean => {
+        ground: (gameFieldSize: Vector, cubeSize: number): boolean => {
             for(const figureCube of this.cubes) {
-                if (this.position[1] + figureCube.position[1] < -(size[1]/2) + cubeSize / 2) return false;
+                if (this.position[1] + figureCube.position[1] < -(gameFieldSize[1]/2) + cubeSize / 2) return false;
             }
             return true;
         }

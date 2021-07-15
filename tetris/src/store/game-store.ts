@@ -22,20 +22,24 @@ class GameStore {
 		position: [0, 0, 0],
 		cubes: []
 	};
+	finalFigure: IFigure = {
+		position: [0, 0, 0],
+		cubes: []
+	}
 	heap: ICube[] = [];
 	delay = {
-		normal: 1000,
+		normal: 2000,
 		fast: 50,
-		current: 1000
+		current: 2000
 	};
 	score = 0;
 	gameState: IGameState = IGameState.Playing;
-
 
 	constructor() {
 		makeAutoObservable(this, {
 			size: observable,
 			figure: observable,
+			finalFigure: observable,
 			heap: observable,
 			delay: observable,
 			score: observable,
@@ -82,6 +86,15 @@ class GameStore {
 		this.figure.position = figure.position;
 	}
 
+	setFinalFigure(): void {
+		const figure = new Figure(this.figure.position, this.figure.cubes);
+
+		this.finalFigure = {
+			cubes: this.figure.cubes,
+			position: figure.getFinalFigurePosition(this.heap, this.size, this.cubeSize, this.dy)
+		};
+	}
+
 	moveFigure(axis: Axis, length: number): void {
 		const figure = new Figure(this.figure.position, this.figure.cubes);
 		figure.move(axis, length);
@@ -99,6 +112,8 @@ class GameStore {
 				this.createNewFigure();
 			}
 		}
+
+		this.setFinalFigure();
 	}
 
 	/**
@@ -117,6 +132,8 @@ class GameStore {
 			figure.check.gameField(this.size, this.cubeSize)
 		) {
 			this.figure.cubes = figure.cubes;
+
+			this.setFinalFigure();
 		}
 	}
 
@@ -138,11 +155,11 @@ class GameStore {
 				position: newFigure.position,
 				cubes: newFigure.cubes
 			};
+
+			this.setFinalFigure();
 		} else {
 			this.gameState = IGameState.Loose;
 		}
-
-
 	}
 
 	/**
@@ -154,49 +171,6 @@ class GameStore {
 			color: cube.color
 		})))
 	}
-
-	// return true if NO collision
-	// check = {
-	// 	gameField: (figure: Figure) => {
-	// 		for(const figureCube of figure.cubes) {
-	// 			if (
-	// 				(Math.abs(figure.position[0] + figureCube.position[0]) > (this.size[0] - this.cubeSize) / 2) ||
-	// 				(Math.abs(figure.position[2] + figureCube.position[2]) > (this.size[2] - this.cubeSize) / 2)
-	// 			) return false;
-	// 		}
-	// 		return true;
-	// 	},
-	// 	heap: (figure: Figure): boolean => {
-	// 		for(const figureCube of figure.cubes) {
-	// 			for(const heapCube of this.heap) {
-	// 				const collision = [0, 1, 2].reduce(
-	// 					(acc, idx) => acc && (
-	// 						Math.abs(
-	// 							figure.position[idx] + figureCube.position[idx] - heapCube.position[idx]
-	// 						) < this.cubeSize),
-	// 					true
-	// 				);
-	//
-	// 				if (collision) return false;
-	//
-	// 				// if (
-	// 				// 	(Math.abs(figure.position[0] + figureCube.position[0] - heapCube.position[0]) < this.cubeSize) &&
-	// 				// 	(Math.abs(figure.position[1] + figureCube.position[1] - heapCube.position[1]) < this.cubeSize) &&
-	// 				// 	(Math.abs(figure.position[2] + figureCube.position[2] - heapCube.position[2]) < this.cubeSize)
-	// 				// ) {
-	// 				// 	return false;
-	// 				// }
-	// 			}
-	// 		}
-	// 		return true;
-	// 	},
-	// 	ground: (figure: Figure): boolean => {
-	// 		for(const figureCube of figure.cubes) {
-	// 			if (figure.position[1] + figureCube.position[1] < -(this.size[1]/2) + this.cubeSize / 2) return false;
-	// 		}
-	// 		return true;
-	// 	}
-	// }
 
 	deleteLevel(level: number) {
 		const heap: ICube[] = [];
@@ -217,30 +191,17 @@ class GameStore {
 	deleteLevels(): void {
 		let levelsToDelete: number[] = [];
 		for (let y = (this.size[1] - 1) / 2; y >= -(this.size[1] - 1) / 2; y--) {
-			// console.log(this.heap.filter(cube => cube.position[1] === y).length);
-			// console.log(toJS(this.figure.position[1]));
-			// console.log(this.heap.filter(cube => cube.position[1] === y).length);
 			if (this.heap.filter(cube => cube.position[1] === y).length === this.size[0] * this.size[2]) {
 				levelsToDelete.push(y);
-				// console.log("to delete: ", levelsToDelete);
-				// this.score += this.size[0] * this.size[2];
-				// this.heap = this.heap.filter(cube => )
 			}
 		}
 
 		this.score += this.size[0] * this.size[2] * levelsToDelete.length;
-		// delete levels
-		// this.heap = this.heap.filter(cube => !levelsToDelete.includes(cube.position[1]));
-		// collapse levels
 		levelsToDelete.sort((a, b) => a - b);
-		// console.log("to delete: ", levelsToDelete);
 		levelsToDelete.forEach((level, idx) => {
-			// console.log("before", toJS(this.heap));
-			// console.log(level, idx, level - idx);
 			this.deleteLevel(level - idx);
-			// console.log("after", toJS(this.heap));
 		})
-
+		this.setFinalFigure();
 	}
 }
 

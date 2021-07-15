@@ -31,25 +31,30 @@ const CAMERA = {
     RADIUS: 20
 }
 
+interface IMaterials {
+    [key: string]: BABYLON.StandardMaterial
+}
+
 export class World3d {
-    private readonly coloredMaterials: {
-        [key: string]: BABYLON.StandardMaterial
-    };
+    private readonly coloredMaterials: IMaterials;
     readonly scene: BABYLON.Scene;
     private camera: BABYLON.ArcRotateCamera;
     private light: BABYLON.HemisphericLight;
     private ground: BABYLON.Mesh;
     private gameField: BABYLON.Mesh;
     private figure: BABYLON.Mesh[];
+    private finalFigure: BABYLON.Mesh[];
     private heap: BABYLON.Mesh[];
     private start: number;
     public publisher3D = new Publisher({
         getFigure: () => this.figure,
         setFigure: (figure: BABYLON.Mesh[]) => { this.figure = figure },
         rerenderFigure: () => this.rerenderFigure(),
-        updateFigure: (idx: number, position: Vector, material: string) => { this.updateFigure(idx, position, material) },
+        updateFigure: () => this.updateFigure(),
+        rerenderFinalFigure:() => this.rerenderFinalFigure(),
+        updateFinalFigure: () => this.updateFinalFigure(),
         rerenderHeap: () => this.rerenderHeap(),
-        updateHeap: (idx: number, position: Vector, material: string) => { this.updateHeap(idx, position, material) },
+        updateHeap: () => this.updateHeap(),
         rerenderGround: () => this.rerenderGround(),
         rerenderGameField: () => this.rerenderGameField()
     });
@@ -59,14 +64,12 @@ export class World3d {
         this.scene = new BABYLON.Scene(engine);
         this.camera = this.createCamera(canvas);
         this.light = this.createLight();
-        this.coloredMaterials = Object.fromEntries(
-            this.publisherStore.get("getState").colors
-                .map((color: string) => [color, this.createMaterial(color)])
-        );
+        this.coloredMaterials = this.createMaterials();
         this.ground = this.createGround();
         this.gameField = this.createGameField();
         this.publisherStore.dispatch("createNewFigure")();
         this.figure = this.createFigureFromState();
+        this.finalFigure = this.createFinalFigureFromState();
         this.heap = this.createHeapFromState();
         this.start = Date.now().valueOf();
 
@@ -158,19 +161,44 @@ export class World3d {
         this.figure = this.createFigureFromState();
     }
 
+    rerenderFinalFigure() {
+        this.finalFigure.forEach(f => f.dispose());
+        this.finalFigure = this.createFinalFigureFromState();
+    }
+
     rerenderHeap() {
         this.heap.forEach(f => f.dispose());
         this.heap = this.createHeapFromState();
     }
 
-    updateFigure(idx: number, position: Vector, material: string) {
-        this.figure[idx].position = new BABYLON.Vector3(...position);
-        this.figure[idx].material = this.coloredMaterials[material];
+    updateFigure() {
+        this.figure.forEach((cube, idx) => {
+            cube.position = new BABYLON.Vector3(...
+                vectorPlusVector(
+                    this.publisherStore.get("getState").figure.position,
+                    this.publisherStore.get("getState").figure.cubes[idx].position
+                )
+            );
+            cube.material = this.coloredMaterials[this.publisherStore.get("getState").figure.cubes[idx].color];
+        });
     }
 
-    updateHeap(idx: number, position: Vector, material: string) {
-        this.heap[idx].position = new BABYLON.Vector3(...position);
-        this.heap[idx].material = this.coloredMaterials[material]
+    updateFinalFigure() {
+        this.finalFigure.forEach((cube, idx) => {
+            cube.position = new BABYLON.Vector3(...
+                vectorPlusVector(
+                    this.publisherStore.get("getState").finalFigure.position,
+                    this.publisherStore.get("getState").finalFigure.cubes[idx].position
+                )
+            );
+            cube.material = this.coloredMaterials["T" + this.publisherStore.get("getState").finalFigure.cubes[idx].color];
+        })
+    }
+
+    updateHeap() {
+        this.heap.forEach((cube, idx) => {
+            cube.position = new BABYLON.Vector3(...this.publisherStore.get("getState").heap[idx].position);
+        });
     }
 
     rerenderGround() {
@@ -248,10 +276,10 @@ export class World3d {
         return ground;
     }
 
-    private createCube = (cube: ICube): BABYLON.Mesh => {
+    private createCube = (cube: ICube, transparent = false): BABYLON.Mesh => {
         const cubeScene = BABYLON.MeshBuilder.CreateBox("cube", { size: this.publisherStore.get("getState").cubeSize });
         cubeScene.position = new BABYLON.Vector3(...cube.position);
-        cubeScene.material = this.coloredMaterials[cube.color];
+        cubeScene.material = this.coloredMaterials[(transparent ? "T" : "") + cube.color];
         return cubeScene;
     }
 
@@ -266,6 +294,17 @@ export class World3d {
         return figureScene;
     }
 
+    private createFinalFigureFromState(): BABYLON.Mesh[] {
+        const finalFigureScene: BABYLON.Mesh[] = [];
+        for(const cube of this.publisherStore.get("getState").finalFigure.cubes) {
+            finalFigureScene.push(this.createCube({
+                position: vectorPlusVector(cube.position, this.publisherStore.get("getState").finalFigure.position),
+                color: cube.color
+            }, true));
+        }
+        return finalFigureScene;
+    }
+
     private createHeapFromState(): BABYLON.Mesh[] {
         const heapScene: BABYLON.Mesh[] = [];
         for(const cube of this.publisherStore.get("getState").heap) {
@@ -274,9 +313,19 @@ export class World3d {
         return heapScene;
     }
 
-    private createMaterial(hex: string) {
+    private createMaterial(hex: string, transparent = false) {
         const material = new BABYLON.StandardMaterial(`coloredMaterial:${hex}`, this.scene);
         material.diffuseColor = BABYLON.Color3.FromHexString(hex);
+        if (transparent) material.alpha = 0.5;
         return material;
+    }
+
+    private createMaterials(): IMaterials {
+        const materials: IMaterials = {};
+        this.publisherStore.get("getState").colors.forEach((color: string) => {
+            materials[color] = this.createMaterial(color);
+            materials["T" + color] = this.createMaterial(color, true);
+        })
+        return materials;
     }
 }

@@ -1,8 +1,6 @@
 import {reaction, toJS} from "mobx";
 import {useStore} from "../store/store";
 import {IListeners, Publisher} from "./observer";
-import {ICube} from "./cube";
-import {vectorPlusVector} from "./math";
 
 const useMobX = () => {
     const gameStore = useStore("gameStore");
@@ -16,22 +14,29 @@ const useMobX = () => {
             setDelay: (delay: typeof gameStore.delay.current) => gameStore.delay.current = delay,
             getState: () => gameStore,
             getFigure: () => gameStore.figure,
+            getFinalFigure: () => gameStore.finalFigure,
             getHeap: () => gameStore.heap,
         },
         init: (publisherStore: Publisher<IListeners>, publisher3D: Publisher<IListeners>) => {
+            // update figure (store → scene)
             reaction(
                 () => toJS(publisherStore.get("getFigure")),
                 (figure, prevFigure) => {
                     if (figure.cubes.length !== prevFigure.cubes.length) {
                         publisher3D.dispatch("rerenderFigure")();
                     }
-                    figure.cubes.forEach((cubeStore: ICube, idx: number) => {
-                        publisher3D.dispatch("updateFigure")(
-                            idx,
-                            vectorPlusVector(figure.position, cubeStore.position),
-                            cubeStore.color
-                        );
-                    });
+                    publisher3D.dispatch("updateFigure")();
+                }
+            );
+
+            // update final position of figure (store → scene)
+            reaction(
+                () => toJS(publisherStore.get("getFinalFigure")),
+                (finalFigure, prevFinalFigure) => {
+                    if (finalFigure.cubes.length !== prevFinalFigure.cubes.length) {
+                        publisher3D.dispatch("rerenderFinalFigure")();
+                    }
+                    publisher3D.dispatch("updateFinalFigure")();
                 }
             );
 
@@ -42,13 +47,7 @@ const useMobX = () => {
                     if (heap.length !== prevHeap.length) {
                         publisher3D.dispatch("rerenderHeap")();
                     }
-                    heap.forEach((cubeStore: ICube, idx: number) => {
-                        publisher3D.dispatch("updateHeap")(
-                            idx,
-                            cubeStore.position,
-                            cubeStore.color
-                        );
-                    });
+                    publisher3D.dispatch("updateHeap")();
                 }
             );
 
