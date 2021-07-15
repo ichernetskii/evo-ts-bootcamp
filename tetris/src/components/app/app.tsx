@@ -1,79 +1,28 @@
 import * as React from "react";
 import {useLayoutEffect} from "react";
-import {reaction, toJS} from "mobx";
 import {observer} from "mobx-react-lite";
 import FormCta from "../form-cta/form-cta";
-import {World3d} from "../../classes/world3d";
-import {Axis, vectorPlusVector} from "../../classes/math";
 import {useStore} from "../../store/store";
-import {createPublisher} from "../../classes/observer";
-import {IFigure} from "../../classes/figure";
-import {ICube} from "../../classes/cube";
-import s from  "./app.module.scss";
+import {World3d} from "../../classes/world3d";
+import {Axis} from "../../classes/math";
+import {Publisher} from "../../classes/observer";
+import useMobX from "../../classes/observer.MobX";
 import {IGameState} from "../../classes/game-state";
+import s from  "./app.module.scss";
 
 const App: React.FC = observer(() => {
+    const {storeConfig, init} = useMobX();
     const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
     const world3d = React.useRef<World3d | null>(null);
-    const gameStore = useStore("gameStore");
     const appStore = useStore("appStore");
-
-    const publisherStore = createPublisher({
-        createNewFigure: gameStore.createNewFigure,
-        getState: () => gameStore,
-        getFigure: () => gameStore.figure,
-        getHeap: () => gameStore.heap,
-    });
+    const publisherStore = new Publisher(storeConfig);
 
     useLayoutEffect(() => {
         if (canvasRef.current) {
             canvasRef.current.focus();
-            world3d.current = new World3d(canvasRef.current, gameStore, publisherStore);
+            world3d.current = new World3d(canvasRef.current, publisherStore);
 
-            // update figure (store → scene)
-            reaction(
-                () => toJS(publisherStore.get("getFigure")),
-                (figure, prevFigure) => {
-                    if (figure.cubes.length !== prevFigure.cubes.length) {
-                        world3d.current?.publisher3D.dispatch("rerenderFigure");
-                    }
-                    figure.cubes.forEach((cubeStore, idx) => {
-                        world3d.current?.publisher3D.dispatch(
-                            "updateFigure",
-                            idx,
-                            vectorPlusVector(figure.position, cubeStore.position),
-                            cubeStore.color
-                        );
-                    });
-                }
-            );
-
-            // update heap (store → scene)
-            reaction(
-                () => toJS(publisherStore.get("getHeap")),
-                (heap, prevHeap) => {
-                    if (heap.length !== prevHeap.length) {
-                        world3d.current?.publisher3D.dispatch("rerenderHeap");
-                    }
-                    heap.forEach((cubeStore, idx) => {
-                        world3d.current?.publisher3D.dispatch(
-                            "updateHeap",
-                            idx,
-                            cubeStore.position,
-                            cubeStore.color
-                        );
-                    });
-                }
-            );
-
-            // update gameField & ground (store → gameField, ground)
-            reaction(
-                () => toJS(publisherStore.get("getState").size),
-                () => {
-                    world3d.current?.publisher3D.dispatch("rerenderGround");
-                    world3d.current?.publisher3D.dispatch("rerenderGameField");
-                }
-            )
+            init(publisherStore, world3d.current?.publisher3D);
         }
     }, []);
 
@@ -81,16 +30,16 @@ const App: React.FC = observer(() => {
         <div className={s.app}>
             <FormCta />
             <div className={s.toolbox}>
-                <div>State: {gameStore.gameState}</div>
-                <div>Score: {gameStore.score}</div>
+                <div>State: {publisherStore.get("getState").gameState}</div>
+                <div>Score: {publisherStore.get("getState").score}</div>
                 <label>
                     X: <input
                         type="number"
                         min="2"
                         max="20"
                         size={100}
-                        value={gameStore.size[0]}
-                        onChange={e => gameStore.changeGameFieldSize(Axis.X, parseInt(e.target.value))}
+                        value={publisherStore.get("getState").size[0]}
+                        onChange={e => publisherStore.dispatch("changeGameFieldSize")(Axis.X, parseInt(e.target.value))}
                     />
                 </label>
                 <label>
@@ -99,8 +48,8 @@ const App: React.FC = observer(() => {
                     min="2"
                     max="20"
                     size={100}
-                    value={gameStore.size[1]}
-                    onChange={e => gameStore.changeGameFieldSize(Axis.Y, parseInt(e.target.value))}
+                    value={publisherStore.get("getState").size[1]}
+                    onChange={e => publisherStore.dispatch("changeGameFieldSize")(Axis.Y, parseInt(e.target.value))}
                 />
                 </label>
                 <label>
@@ -109,16 +58,16 @@ const App: React.FC = observer(() => {
                     min="2"
                     max="20"
                     size={100}
-                    value={gameStore.size[2]}
-                    onChange={e => gameStore.changeGameFieldSize(Axis.Z, parseInt(e.target.value))}
+                    value={publisherStore.get("getState").size[2]}
+                    onChange={e => publisherStore.dispatch("changeGameFieldSize")(Axis.Z, parseInt(e.target.value))}
                 />
                 </label>
-                <button onClick={gameStore.gameStateToggle}>
-                    {gameStore.gameState === IGameState.Playing ? "Stop" : "Play"}
+                <button onClick={publisherStore.get("getState").gameStateToggle}>
+                    {publisherStore.get("getState").gameState === IGameState.Playing ? "Stop" : "Play"}
                 </button>
                 <button onClick={() => {
                     appStore.isPopupVisible = true;
-                    gameStore.gameState = IGameState.Paused;
+                    publisherStore.get("getState").gameState = IGameState.Paused;
                 }}>Help</button>
             </div>
             <canvas ref={canvasRef} tabIndex={0} />
