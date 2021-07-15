@@ -99,8 +99,10 @@ export default (env = {}) => {
 			]
 		},
         output: {
-            filename: "bundle.js",
+            filename: "[name].[fullhash:8].js",
             path: path.resolve(__dirname, "dist"),
+			sourceMapFilename: "[name].[fullhash:8].map",
+			chunkFilename: "[id].[fullhash:8].js"
         },
 		target: isProd ? "browserslist" : "web", // disable browserslist for development
 		devtool: isProd ? undefined : "source-map",
