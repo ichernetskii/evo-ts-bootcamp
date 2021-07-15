@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "webpack --env mode=development",
     "watch": "webpack serve --env mode=development",
-    "prod": "webpack --env mode=production",
+    "build": "webpack --env mode=production",
     "test": "jest"
   },
   "author": "Ilya Chernetsky <ilya.chernetsky@gmail.com>",
