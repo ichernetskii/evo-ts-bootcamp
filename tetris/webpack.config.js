@@ -100,7 +100,7 @@ export default (env = {}) => {
 		},
         output: {
             filename: "[name].[fullhash:8].js",
-            path: path.resolve(__dirname, "dist"),
+            path: path.resolve(__dirname, "build"),
 			sourceMapFilename: "[name].[fullhash:8].map",
 			chunkFilename: "[id].[fullhash:8].js"
         },
