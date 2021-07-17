@@ -135,7 +135,7 @@ export default (env = {}) => {
                 },
 				// Loading fonts & images
 				{
-					test: /fonts.*\.(ttf|otf|eot|woff2?|svg|jpe?g|png|gif)$/,
+					test: /fonts.*\.(ttf|otf|eot|woff2?|svg)$/,
 					use: [
 						{
 							loader: "file-loader",
@@ -147,6 +147,20 @@ export default (env = {}) => {
 						}
 					]
 				},
+				// Loading images
+				{
+					test: /images.*\.(svg|jpe?g|png|gif)$/,
+					use: [
+						{
+							loader: "file-loader",
+							options: {
+								name: "[path][name].[ext]",
+								publicPath: isProd ? "../" : "",
+								esModule: false
+							}
+						}
+					]
+				}
             ],
         },
     }

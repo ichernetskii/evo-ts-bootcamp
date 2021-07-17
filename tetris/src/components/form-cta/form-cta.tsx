@@ -16,7 +16,7 @@ const FormCta: React.FC<{}> = observer(() => {
     const publisherStore = new Publisher(storeConfig);
 
     const close = () => {
-        publisherStore.dispatch("gameStateToggle")();
+        publisherStore.dispatch("gameStatePlay")();
         appStore.popupVisibleToggle();
     }
 

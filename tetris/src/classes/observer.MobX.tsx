@@ -13,6 +13,8 @@ const useMobX = () => {
             deleteLevels: gameStore.deleteLevels,
             rotateFigure: gameStore.rotateFigure,
             gameStateToggle: gameStore.gameStateToggle,
+            gameStatePause: gameStore.gameStatePause,
+            gameStatePlay: gameStore.gameStatePlay,
             setDelay: (delay: typeof gameStore.delay.current) => gameStore.delay.current = delay,
             // setCameraPosition: (alpha: number, beta: number) => gameStore.camera = {...gameStore.camera, alpha, beta},
             getState: () => gameStore,

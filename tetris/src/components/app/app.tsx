@@ -93,19 +93,21 @@ const App: React.FC = observer(() => {
                 Right = "Right"
             }
 
-            switch (eventData.dir) {
-                case Directions.Up:
-                    publisherStore.dispatch("moveFigure")(Axis.X, -1);
-                    break;
-                case Directions.Down:
-                    publisherStore.dispatch("moveFigure")(Axis.X, 1);
-                    break;
-                case Directions.Left:
-                    publisherStore.dispatch("moveFigure")(Axis.Z, -1);
-                    break;
-                case Directions.Right:
-                    publisherStore.dispatch("moveFigure")(Axis.Z, 1);
-                    break;
+            if (publisherStore.get("getState").gameState === IGameState.Playing) {
+                switch (eventData.dir) {
+                    case Directions.Up:
+                        publisherStore.dispatch("moveFigure")(Axis.X, -1);
+                        break;
+                    case Directions.Down:
+                        publisherStore.dispatch("moveFigure")(Axis.X, 1);
+                        break;
+                    case Directions.Left:
+                        publisherStore.dispatch("moveFigure")(Axis.Z, -1);
+                        break;
+                    case Directions.Right:
+                        publisherStore.dispatch("moveFigure")(Axis.Z, 1);
+                        break;
+                }
             }
         },
         delta: 30
@@ -182,7 +184,7 @@ const App: React.FC = observer(() => {
 
     const onOptionsClick = () => {
         appStore.popupVisibleToggle();
-        publisherStore.dispatch("gameStateToggle")();
+        publisherStore.dispatch("gameStatePause")();
     }
 
     return (

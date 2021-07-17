@@ -218,7 +218,7 @@ export class World3d {
         );
         ground.position.y = -this.publisherStore.get("getState").size[1] / 2;
 
-        const groundTexture = new BABYLON.Texture("./src/images/logo.jpg", this.scene);
+        const groundTexture = new BABYLON.Texture(require("@/images/logo.jpg"), this.scene);
         groundTexture.uScale = this.publisherStore.get("getState").size[0];
         groundTexture.vScale = this.publisherStore.get("getState").size[2];
         const groundMaterial = new BABYLON.StandardMaterial(

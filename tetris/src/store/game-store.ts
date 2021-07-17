@@ -1,14 +1,8 @@
 import {action, makeAutoObservable, observable} from "mobx";
-import {
-	Axis,
-	Vector,
-	randomIntFromInterval,
-	roundVector,
-	vectorPlusVector
-} from "../classes/math";
-import {IFigure, Figure} from "../classes/figure";
+import {Axis, randomIntFromInterval, roundVector, Vector, vectorPlusVector} from "../classes/math";
+import {Figure, IFigure} from "../classes/figure";
 import {ICube} from "../classes/cube";
-import {figures, colors} from "./figures";
+import {colors, figures} from "./figures";
 import {IGameState} from "../classes/game-state";
 
 class GameStore {
@@ -59,6 +53,8 @@ class GameStore {
 			nextFigure: observable,
 			changeGameFieldSize: action.bound,
 			gameStateToggle: action.bound,
+			gameStatePause: action.bound,
+			gameStatePlay: action.bound,
 			setPositionFigure: action.bound,
 			moveFigure: action.bound,
 			rotateFigure: action.bound,
@@ -100,6 +96,14 @@ class GameStore {
 				this.gameState = IGameState.Playing
 				break;
 		}
+	}
+
+	gameStatePlay() {
+		this.gameState = IGameState.Playing;
+	}
+
+	gameStatePause() {
+		this.gameState = IGameState.Paused;
 	}
 
 	setPositionFigure(position: Vector): void {
