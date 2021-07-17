@@ -4,23 +4,25 @@ import {ICube} from "./cube";
 import {IListeners, Publisher} from "./observer";
 import {IGameState} from "./game-state";
 
-enum KeyboardKeys {
-    Space = 32,
-    Left = 37,
-    Up = 38,
-    Right = 39,
-    Down = 40,
-    A = 65,
-    D = 68,
-    E = 69,
-    Q = 81,
-    S = 83,
-    W = 87
-}
+// enum KeyboardKeys {
+//     Space = 32,
+//     Left = 37,
+//     Up = 38,
+//     Right = 39,
+//     Down = 40,
+//     A = 65,
+//     D = 68,
+//     E = 69,
+//     Q = 81,
+//     S = 83,
+//     W = 87
+// }
 
-const GROUND_MATERIAL = "#009900";
-const GAMEFIELD_COLOR = [255, 255, 255, 0.2];
+const GROUND_MATERIAL = "#ff7700";
 const GAMEFIELD_WIDTH = 4.0;
+const GAMEFIELD_COLOR = [255, 255, 255, 0.2];
+const CUBES_BORDER_WIDTH = 6.0;
+const CUBES_BORDER_COLOR = [255, 255, 255, 0.2];
 const LIGHT = {
     POSITION: [2, 20, 2],
     INTENSITY: 1
@@ -32,6 +34,7 @@ interface IMaterials {
 
 export class World3d {
     private readonly coloredMaterials: IMaterials;
+    private canvas: HTMLCanvasElement;
     readonly scene: BABYLON.Scene;
     private camera: BABYLON.ArcRotateCamera;
     private light: BABYLON.HemisphericLight;
@@ -52,10 +55,12 @@ export class World3d {
         updateHeap: () => this.updateHeap(),
         rerenderGround: () => this.rerenderGround(),
         rerenderGameField: () => this.rerenderGameField(),
-        moveCamera: () => this.moveCamera()
+        // moveCamera: () => this.moveCamera(),
+        updateGameState: () => this.updateGameState()
     });
 
     public constructor(canvas: HTMLCanvasElement, private publisherStore: Publisher<IListeners>) {
+        this.canvas = canvas;
         const engine = new BABYLON.Engine(canvas);
         this.scene = new BABYLON.Scene(engine);
         this.camera = this.createCamera(canvas);
@@ -82,73 +87,9 @@ export class World3d {
             }
         });
 
-        this.scene.onKeyboardObservable.add(this.onKeyboardClick.bind(this));
-
         engine.runRenderLoop(() => {
             this.scene.render();
         });
-    }
-
-    onKeyboardClick(kbInfo: BABYLON.KeyboardInfo) {
-        if (this.publisherStore.get("getState").gameState === IGameState.Playing) {
-            switch (kbInfo.type) {
-                case BABYLON.KeyboardEventTypes.KEYDOWN:
-                    switch (kbInfo.event.keyCode) {
-                        // up
-                        case KeyboardKeys.Up:
-                            this.publisherStore.dispatch("moveFigure")(Axis.X, -1);
-                            break;
-                        // down
-                        case KeyboardKeys.Down:
-                            this.publisherStore.dispatch("moveFigure")(Axis.X, 1);
-                            break;
-                        // right
-                        case KeyboardKeys.Right:
-                            this.publisherStore.dispatch("moveFigure")(Axis.Z, 1);
-                            break;
-                        // left
-                        case KeyboardKeys.Left:
-                            this.publisherStore.dispatch("moveFigure")(Axis.Z, -1);
-                            break;
-                        // space
-                        case KeyboardKeys.Space:
-                            this.publisherStore.dispatch("setDelay")(this.publisherStore.get("getState").delay.fast);
-                            break;
-                        // rotate +X
-                        case KeyboardKeys.Q:
-                            this.publisherStore.dispatch("rotateFigure")(Axis.X, 90);
-                            break;
-                        // rotate -X
-                        case KeyboardKeys.A:
-                            this.publisherStore.dispatch("rotateFigure")(Axis.X, -90);
-                            break;
-                        // rotate +Y
-                        case KeyboardKeys.W:
-                            this.publisherStore.dispatch("rotateFigure")(Axis.Y, 90);
-                            break;
-                        // rotate -Y
-                        case KeyboardKeys.S:
-                            this.publisherStore.dispatch("rotateFigure")(Axis.Y, -90);
-                            break;
-                        // rotate +Z
-                        case KeyboardKeys.E:
-                            this.publisherStore.dispatch("rotateFigure")(Axis.Z, 90);
-                            break;
-                        // rotate -Z
-                        case KeyboardKeys.D:
-                            this.publisherStore.dispatch("rotateFigure")(Axis.Z, -90);
-                            break;
-                    }
-                    break;
-                case BABYLON.KeyboardEventTypes.KEYUP:
-                    switch (kbInfo.event.keyCode) {
-                        case KeyboardKeys.Space:
-                            this.publisherStore.dispatch("setDelay")(this.publisherStore.get("getState").delay.normal);
-                            break;
-                    }
-                break;
-            }
-        }
     }
 
     rerenderFigure() {
@@ -222,9 +163,20 @@ export class World3d {
         return camera;
     }
 
-    moveCamera() {
-        this.camera.alpha = this.publisherStore.get("getState").camera.alpha * (Math.PI/180);
-        this.camera.beta = this.publisherStore.get("getState").camera.beta * (Math.PI/180);
+    // moveCamera() {
+    //     this.camera.alpha = this.publisherStore.get("getState").camera.alpha * (Math.PI/180);
+    //     this.camera.beta = this.publisherStore.get("getState").camera.beta * (Math.PI/180);
+    // }
+
+    updateGameState() {
+        if (this.publisherStore.get("getState").gameState === IGameState.Playing) {
+            this.camera.inputs.remove(this.camera.inputs.attached.pointers);
+            this.camera.inputs.remove(this.camera.inputs.attached.mousewheel);
+        } else {
+            this.camera.inputs.addPointers();
+            this.camera.inputs.addMouseWheel();
+        }
+
     }
 
     private createLight(): BABYLON.HemisphericLight {
@@ -266,12 +218,16 @@ export class World3d {
         );
         ground.position.y = -this.publisherStore.get("getState").size[1] / 2;
 
+        const groundTexture = new BABYLON.Texture("./src/images/logo.jpg", this.scene);
+        groundTexture.uScale = this.publisherStore.get("getState").size[0];
+        groundTexture.vScale = this.publisherStore.get("getState").size[2];
         const groundMaterial = new BABYLON.StandardMaterial(
             "groundMaterial",
             this.scene
         );
-
-        groundMaterial.diffuseColor = BABYLON.Color3.FromHexString(GROUND_MATERIAL);
+        groundMaterial.diffuseTexture = groundTexture;
+        groundMaterial.diffuseColor = BABYLON.Color3.FromHexString("#FFFFFF");
+        groundMaterial.alpha = 0.5;
         groundMaterial.backFaceCulling = false;
         ground.material = groundMaterial;
 
@@ -293,8 +249,8 @@ export class World3d {
                 color: cube.color
             });
             cube3D.enableEdgesRendering();
-            cube3D.edgesWidth = 6;
-            cube3D.edgesColor = new BABYLON.Color4(...[255, 255, 255, 0.2]);
+            cube3D.edgesWidth = CUBES_BORDER_WIDTH;
+            cube3D.edgesColor = new BABYLON.Color4(...CUBES_BORDER_COLOR);
             figureScene.push(cube3D);
         }
         return figureScene;
@@ -309,7 +265,7 @@ export class World3d {
             }, true);
             cube3D.enableEdgesRendering();
             cube3D.edgesWidth = 2;
-            cube3D.edgesColor = new BABYLON.Color4(...[255, 255, 255, 0.3]);
+            cube3D.edgesColor = new BABYLON.Color4(...[255, 255, 255, 0.4]);
             finalFigureScene.push(cube3D);
         }
         return finalFigureScene;
@@ -318,7 +274,11 @@ export class World3d {
     private createHeapFromState(): BABYLON.Mesh[] {
         const heapScene: BABYLON.Mesh[] = [];
         for(const cube of this.publisherStore.get("getState").heap) {
-            heapScene.push(this.createCube(cube));
+            const cube3D = this.createCube(cube);
+            cube3D.enableEdgesRendering();
+            cube3D.edgesWidth = CUBES_BORDER_WIDTH;
+            cube3D.edgesColor = new BABYLON.Color4(...CUBES_BORDER_COLOR);
+            heapScene.push(cube3D);
         }
         return heapScene;
     }

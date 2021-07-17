@@ -8,6 +8,7 @@ import s from "./form-cta.module.scss";
 import {Axis} from "../../classes/math";
 import {Publisher} from "../../classes/observer";
 import useMobX from "../../classes/observer.MobX";
+import {runInAction} from "mobx";
 
 const FormCta: React.FC<{}> = observer(() => {
     const appStore = useStore("appStore");
@@ -15,8 +16,8 @@ const FormCta: React.FC<{}> = observer(() => {
     const publisherStore = new Publisher(storeConfig);
 
     const close = () => {
-        appStore.isPopupVisible = false;
-        publisherStore.dispatch("startGame")();
+        publisherStore.dispatch("gameStateToggle")();
+        appStore.popupVisibleToggle();
     }
 
     return (
@@ -53,30 +54,6 @@ const FormCta: React.FC<{}> = observer(() => {
                             max="20"
                             value={publisherStore.get("getState").size[2]}
                             onChange={e => publisherStore.dispatch("changeGameFieldSize")(Axis.Z, parseInt(e.target.value))}
-                        />
-                    </label>
-                    <label>
-                        Alpha: {publisherStore.get("getState").camera.alpha}
-                        <input
-                            type="range"
-                            min="0"
-                            max="180"
-                            value={publisherStore.get("getState").camera.alpha}
-                            onChange={e => publisherStore.dispatch("setCameraPosition")(
-                                parseInt(e.target.value), publisherStore.get("getState").camera.beta
-                            )}
-                        />
-                    </label>
-                    <label>
-                        Beta: {publisherStore.get("getState").camera.beta}
-                        <input
-                            type="range"
-                            min="0"
-                            max="180"
-                            value={publisherStore.get("getState").camera.beta}
-                            onChange={e => publisherStore.dispatch("setCameraPosition")(
-                                publisherStore.get("getState").camera.alpha, parseInt(e.target.value)
-                            )}
                         />
                     </label>
                 </div>

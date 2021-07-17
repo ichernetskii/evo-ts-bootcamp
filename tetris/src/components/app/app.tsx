@@ -9,8 +9,21 @@ import useMobX from "../../classes/observer.MobX";
 import {IGameState} from "../../classes/game-state";
 import {Axis} from "../../classes/math";
 import {useSwipeable} from "react-swipeable";
-import {colors} from "../../store/figures";
 import s from  "./app.module.scss";
+
+enum KeyboardKeys {
+    Space = 32,
+    Left = 37,
+    Up = 38,
+    Right = 39,
+    Down = 40,
+    A = 65,
+    D = 68,
+    E = 69,
+    Q = 81,
+    S = 83,
+    W = 87
+}
 
 const App: React.FC = observer(() => {
     const {storeConfig, init} = useMobX();
@@ -18,6 +31,49 @@ const App: React.FC = observer(() => {
     const world3d = React.useRef<World3d | null>(null);
     const appStore = useStore("appStore");
     const publisherStore = new Publisher(storeConfig);
+    function getSVGFigure(type: number, color: string) {
+        const SVGFigures = [
+            <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="126.203" y="221.863" width="109.25" height="109.25" transform="rotate(-30 126.203 221.863)" fill={color} stroke="#FFF" strokeWidth="10"/>
+                <rect x="31.5901" y="276.489" width="109.25" height="109.25" transform="rotate(-30 31.5901 276.489)" fill={color} stroke="#FFF" strokeWidth="10"/>
+                <rect x="166.332" y="72.6251" width="109.25" height="109.25" transform="rotate(-30 166.332 72.6251)" fill={color} stroke="#FFF" strokeWidth="10"/>
+                <rect x="220.817" y="167.238" width="109.25" height="109.25" transform="rotate(-30 220.817 167.238)" fill={color} stroke="#FFF" strokeWidth="10"/>
+            </svg>,
+            <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="123.948" y="199.565" width="111.234" height="111.234" transform="rotate(-30 123.948 199.565)" fill={color} stroke="#FFF" strokeWidth="10"/>
+                <rect x="27.6169" y="255.182" width="111.234" height="111.234" transform="rotate(-30 27.6169 255.182)" fill={color} stroke="#FFF" strokeWidth="10"/>
+                <rect x="68.3315" y="103.234" width="111.234" height="111.234" transform="rotate(-30 68.3315 103.234)" fill={color} stroke="#FFF" strokeWidth="10"/>
+                <rect x="220.28" y="143.948" width="111.234" height="111.234" transform="rotate(-30 220.28 143.948)" fill={color} stroke="#FFF" strokeWidth="10"/>
+            </svg>,
+            <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="95.3066" y="95.3066" width="208.693" height="208.693" fill={color} stroke="#FFF" strokeWidth="10"/>
+            </svg>,
+            <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="23.73" y="305.055" width="98.4398" height="98.4398" transform="rotate(-45 23.73 305.055)" fill={color} stroke="#FFF" strokeWidth="10"/>
+                <rect x="93.3374" y="235.448" width="98.4398" height="98.4398" transform="rotate(-45 93.3374 235.448)" fill={color} stroke="#FFF" strokeWidth="10"/>
+                <rect x="162.945" y="165.84" width="98.4398" height="98.4398" transform="rotate(-45 162.945 165.84)" fill={color} stroke="#FFF" strokeWidth="10"/>
+                <rect x="232.552" y="96.2329" width="98.4398" height="98.4398" transform="rotate(-45 232.552 96.2329)" fill={color} stroke="#FFF" strokeWidth="10"/>
+            </svg>,
+            <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="51.8604" y="253.934" width="105.143" height="105.143" transform="rotate(-20 51.8604 253.934)" fill={color} stroke="#FFF" strokeWidth="10"/>
+                <rect x="150.662" y="217.974" width="105.143" height="105.143" transform="rotate(-20 150.662 217.974)" fill={color} stroke="#FFF" strokeWidth="10"/>
+                <rect x="115.228" y="119.162" width="105.143" height="105.143" transform="rotate(-20 115.228 119.162)" fill={color} stroke="#FFF" strokeWidth="10"/>
+                <rect x="214.096" y="83.2129" width="105.143" height="105.143" transform="rotate(-20 214.096 83.2129)" fill={color} stroke="#FFF" strokeWidth="10"/>
+            </svg>,
+            <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="30.5461" y="209.962" width="151.962" height="151.962" transform="rotate(-30 30.5461 209.962)" fill={color} stroke="#FFF" strokeWidth="10"/>
+                <rect x="162.149" y="133.981" width="151.962" height="151.962" transform="rotate(-30 162.149 133.981)" fill={color} stroke="#FFF" strokeWidth="10"/>
+            </svg>,
+            <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="48.5884" y="268.04" width="135.604" height="135.604" transform="rotate(-30 48.5884 268.04)" fill={color} stroke="#FFF" strokeWidth="10"/>
+                <rect x="98.3972" y="82.802" width="135.604" height="135.604" transform="rotate(-30 98.3972 82.802)" fill={color} stroke="#FFF" strokeWidth="10"/>
+                <rect x="166.025" y="200.238" width="135.604" height="135.604" transform="rotate(-30 166.025 200.238)" fill={color} stroke="#FFF" strokeWidth="10"/>
+            </svg>
+        ];
+
+        return SVGFigures[type];
+    }
+
 
     useLayoutEffect(() => {
         if (canvasRef.current) {
@@ -60,36 +116,100 @@ const App: React.FC = observer(() => {
             publisherStore.dispatch("rotateFigure")(axis, 90);
         }
     }
-    const nextFigureColor = colors[publisherStore.get("getState").nextFigure.color];
-    const nextFigure = <svg viewBox="0 0 372 272" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="7.61523" y="187.029" width="90" height="90" transform="rotate(-30 7.61523 187.029)" stroke={nextFigureColor} strokeWidth="10"/>
-        <rect x="85.5576" y="142.029" width="90" height="90" transform="rotate(-30 85.5576 142.029)" stroke={nextFigureColor} strokeWidth="10"/>
-        <rect x="163.5" y="97.0289" width="90" height="90" transform="rotate(-30 163.5 97.0289)" stroke={nextFigureColor} strokeWidth="10"/>
-        <rect x="241.442" y="52.0289" width="90" height="90" transform="rotate(-30 241.442 52.0289)" stroke={nextFigureColor} strokeWidth="10"/>
-    </svg>
+    const nextFigureColor = publisherStore.get("getState").nextFigure.color;
+    const nextFigureType = publisherStore.get("getState").nextFigure.type;
+    const nextFigure = getSVGFigure(nextFigureType, nextFigureColor);
+
+    const onKeyDownHandler = (e: React.KeyboardEvent): void => {
+        if (publisherStore.get("getState").gameState === IGameState.Playing) {
+            switch (e.keyCode) {
+                case KeyboardKeys.Up:
+                    publisherStore.dispatch("moveFigure")(Axis.X, -1);
+                    break;
+                // down
+                case KeyboardKeys.Down:
+                    publisherStore.dispatch("moveFigure")(Axis.X, 1);
+                    break;
+                // right
+                case KeyboardKeys.Right:
+                    publisherStore.dispatch("moveFigure")(Axis.Z, 1);
+                    break;
+                // left
+                case KeyboardKeys.Left:
+                    publisherStore.dispatch("moveFigure")(Axis.Z, -1);
+                    break;
+                // space
+                case KeyboardKeys.Space:
+                    publisherStore.dispatch("setDelay")(publisherStore.get("getState").delay.fast);
+                    break;
+                // rotate +X
+                case KeyboardKeys.Q:
+                    publisherStore.dispatch("rotateFigure")(Axis.X, 90);
+                    break;
+                // rotate -X
+                case KeyboardKeys.A:
+                    publisherStore.dispatch("rotateFigure")(Axis.X, -90);
+                    break;
+                // rotate +Y
+                case KeyboardKeys.W:
+                    publisherStore.dispatch("rotateFigure")(Axis.Y, 90);
+                    break;
+                // rotate -Y
+                case KeyboardKeys.S:
+                    publisherStore.dispatch("rotateFigure")(Axis.Y, -90);
+                    break;
+                // rotate +Z
+                case KeyboardKeys.E:
+                    publisherStore.dispatch("rotateFigure")(Axis.Z, 90);
+                    break;
+                // rotate -Z
+                case KeyboardKeys.D:
+                    publisherStore.dispatch("rotateFigure")(Axis.Z, -90);
+                    break;
+            }
+        }
+    }
+
+    const onKeyUpHandler = (e: React.KeyboardEvent) => {
+        if (publisherStore.get("getState").gameState === IGameState.Playing) {
+            switch (e.keyCode) {
+                case KeyboardKeys.Space:
+                    publisherStore.dispatch("setDelay")(publisherStore.get("getState").delay.normal);
+                    break;
+            }
+        }
+    }
+
+    const onOptionsClick = () => {
+        appStore.popupVisibleToggle();
+        publisherStore.dispatch("gameStateToggle")();
+    }
 
     return (
-        <div className={s.app} {...handlers}>
+        <div
+            className={s.app}
+            {...handlers}
+            onKeyDown={onKeyDownHandler}
+            onKeyUp={onKeyUpHandler}
+            tabIndex={-1}
+        >
             <FormCta />
             <div className={s.toolbox}>
                 <div className={s.toolbox__block}>
-                    <button onClick={publisherStore.get("getState").gameStateToggle}>
+                    <button className={s.toolbox__button} onClick={publisherStore.get("getState").gameStateToggle}>
                         {publisherStore.get("getState").gameState === IGameState.Playing ? "Stop" : "Play"}
                     </button>
-                    <div>
-                        {
-                            publisherStore.get("getState").gameState === IGameState.Loose
+                    <div className={s.toolbox__info}>
+                        <div className={s.toolbox__score} dangerouslySetInnerHTML={{
+                            __html: publisherStore.get("getState").gameState === IGameState.Loose
                                 ? "Loose"
-                                : "Score: " + 100 * publisherStore.get("getState").score
-                        }
-                        <div style={{ color: colors[publisherStore.get("getState").nextFigure.color] }}>
+                                : "Score:&nbsp;" + publisherStore.get("getState").score
+                        }} />
+                        <div className={s.toolbox__figure}>
                             {nextFigure}
                         </div>
                     </div>
-                    <button onClick={() => {
-                        appStore.isPopupVisible = true;
-                        publisherStore.get("getState").gameState = IGameState.Paused;
-                    }}>Options</button>
+                    <button className={s.toolbox__button} onClick={onOptionsClick}>Options</button>
                 </div>
             </div>
             <canvas ref={canvasRef} tabIndex={0} />

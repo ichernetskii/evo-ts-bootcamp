@@ -12,9 +12,9 @@ const useMobX = () => {
             moveFigure: gameStore.moveFigure,
             deleteLevels: gameStore.deleteLevels,
             rotateFigure: gameStore.rotateFigure,
+            gameStateToggle: gameStore.gameStateToggle,
             setDelay: (delay: typeof gameStore.delay.current) => gameStore.delay.current = delay,
-            setCameraPosition: (alpha: number, beta: number) => gameStore.camera = {...gameStore.camera, alpha, beta},
-            startGame: () => gameStore.gameState = IGameState.Playing,
+            // setCameraPosition: (alpha: number, beta: number) => gameStore.camera = {...gameStore.camera, alpha, beta},
             getState: () => gameStore,
             getFigure: () => gameStore.figure,
             getFinalFigure: () => gameStore.finalFigure,
@@ -64,10 +64,17 @@ const useMobX = () => {
             )
 
             // update camera position
+            // reaction(
+            //     () => toJS(publisherStore.get("getState").camera),
+            //     () => {
+            //         publisher3D.dispatch("moveCamera")();
+            //     }
+            // )
+
             reaction(
-                () => toJS(publisherStore.get("getState").camera),
+                () => toJS(publisherStore.get("getState").gameState),
                 () => {
-                    publisher3D.dispatch("moveCamera")();
+                    publisher3D.dispatch("updateGameState")();
                 }
             )
         }

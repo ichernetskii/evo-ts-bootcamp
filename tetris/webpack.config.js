@@ -133,9 +133,9 @@ export default (env = {}) => {
                     test: /\.module\.s[ca]ss$/,
                     use: cssLoaders("sass-loader", true)
                 },
-				// Loading fonts
+				// Loading fonts & images
 				{
-					test: /fonts.*\.(ttf|otf|eot|woff2?|svg)$/,
+					test: /fonts.*\.(ttf|otf|eot|woff2?|svg|jpe?g|png|gif)$/,
 					use: [
 						{
 							loader: "file-loader",

@@ -1,12 +1,17 @@
-import {makeAutoObservable, observable} from "mobx";
+import {action, makeAutoObservable, observable} from "mobx";
 
 class AppStore {
     isPopupVisible = false;
 
     constructor() {
         makeAutoObservable(this, {
-            isPopupVisible: observable
+            isPopupVisible: observable,
+            popupVisibleToggle: action.bound
         });
+    }
+
+    popupVisibleToggle() {
+        this.isPopupVisible = !this.isPopupVisible;
     }
 }
 

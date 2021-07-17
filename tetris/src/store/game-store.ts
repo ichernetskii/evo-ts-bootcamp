@@ -17,7 +17,7 @@ class GameStore {
 	readonly dy = 1;
 	readonly cubeSize = 1;
 
-	size: Vector = [4, 10, 4];
+	size: Vector = [4, 10, 5];
 	figure: IFigure = {
 		position: [0, 0, 0],
 		cubes: []
@@ -28,7 +28,7 @@ class GameStore {
 	}
 	nextFigure = {
 		type: randomIntFromInterval(0, figures.length - 1),
-		color: randomIntFromInterval(0, colors.length - 1)
+		color: colors[randomIntFromInterval(0, colors.length - 1)]
 	}
 
 	heap: ICube[] = [];
@@ -162,11 +162,9 @@ class GameStore {
 	/**
 	 * Randomly creates new figure
 	 */
-	createNewFigure(_color?: string): void {
-		const color = _color ?? this.colors[this.nextFigure.color];
-		this.nextFigure.color = randomIntFromInterval(0, colors.length - 1);
-		const figure = this.figures[this.nextFigure.type];
-		this.nextFigure.type = randomIntFromInterval(0, figures.length - 1);
+	createNewFigure(_color?: string, _type?: number): void {
+		const color = _color ?? this.nextFigure.color;
+		const figure = this.figures[_type ?? this.nextFigure.type];
 
 		const newFigure = new Figure(
 			[(1 - this.size[0] % 2) / 2, (this.size[1] - this.cubeSize)/2, (1 - this.size[2] % 2) / 2],
@@ -175,7 +173,7 @@ class GameStore {
 		newFigure.rotate(Axis.Y, randomIntFromInterval(0, 3)*90);
 
 		if (!newFigure.check.gameField(this.size, this.cubeSize)) {
-			this.createNewFigure(_color);
+			this.createNewFigure(_color, _type);
 			return;
 		}
 
@@ -184,8 +182,9 @@ class GameStore {
 				position: newFigure.position,
 				cubes: newFigure.cubes
 			};
-
 			this.setFinalFigure();
+			this.nextFigure.type = randomIntFromInterval(0, figures.length - 1);
+			this.nextFigure.color = this.colors[randomIntFromInterval(0, colors.length - 1)];
 		} else {
 			this.gameState = IGameState.Loose;
 		}
