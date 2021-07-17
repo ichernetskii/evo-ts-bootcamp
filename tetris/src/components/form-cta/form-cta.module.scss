@@ -11,6 +11,7 @@ input::-webkit-inner-spin-button {
 }
 
 .form-cta {
+  opacity: 0.8;
   position: fixed;
   left: 0;
   right: 0;
@@ -114,22 +115,16 @@ input::-webkit-inner-spin-button {
   width: 300px;
   display: flex;
   justify-content: center;
+  flex-direction: column;
 
   & label {
-    margin-right: 10px;
     color: #000;
+    display: flex;
 
     input {
-      height: 1.6em;
-      width: 40px;
-      margin-top: -4px;
       position: relative;
-      top: -1px;
+      flex-grow: 1;
       color: #000;
-    }
-
-    &:last-child {
-      margin-right: 0;
     }
   }
 }

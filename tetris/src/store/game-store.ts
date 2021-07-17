@@ -17,7 +17,7 @@ class GameStore {
 	readonly dy = 1;
 	readonly cubeSize = 1;
 
-	size: Vector = [5, 10, 5];
+	size: Vector = [4, 10, 4];
 	figure: IFigure = {
 		position: [0, 0, 0],
 		cubes: []
@@ -26,6 +26,11 @@ class GameStore {
 		position: [0, 0, 0],
 		cubes: []
 	}
+	nextFigure = {
+		type: randomIntFromInterval(0, figures.length - 1),
+		color: randomIntFromInterval(0, colors.length - 1)
+	}
+
 	heap: ICube[] = [];
 	delay = {
 		normal: 2000,
@@ -34,6 +39,12 @@ class GameStore {
 	};
 	score = 0;
 	gameState: IGameState = IGameState.Playing;
+
+	camera = {
+		alpha: 30,
+		beta: 55,
+		radius: 20
+	}
 
 	constructor() {
 		makeAutoObservable(this, {
@@ -44,6 +55,8 @@ class GameStore {
 			delay: observable,
 			score: observable,
 			gameState: observable,
+			camera: observable,
+			nextFigure: observable,
 			changeGameFieldSize: action.bound,
 			gameStateToggle: action.bound,
 			setPositionFigure: action.bound,
@@ -56,7 +69,16 @@ class GameStore {
 	}
 
 	changeGameFieldSize(axis: Axis, size: number) {
+		const oldSize = this.size[axis];
 		this.size[axis] = size;
+		if (
+			(this.size[0] + this.size[2] <= 5) ||
+			(this.size[0] === 3 && this.size[2] === 3)
+		) {
+			this.size[axis] = oldSize;
+			return;
+		}
+
 		this.createNewFigure(this.figure.cubes[0].color);
 		this.heap = [];
 		this.gameState = IGameState.Paused;
@@ -141,14 +163,21 @@ class GameStore {
 	 * Randomly creates new figure
 	 */
 	createNewFigure(_color?: string): void {
-		const color = _color ?? this.colors[randomIntFromInterval(0, this.colors.length - 1)];
-		const figure = this.figures[randomIntFromInterval(0, this.figures.length - 1)];
+		const color = _color ?? this.colors[this.nextFigure.color];
+		this.nextFigure.color = randomIntFromInterval(0, colors.length - 1);
+		const figure = this.figures[this.nextFigure.type];
+		this.nextFigure.type = randomIntFromInterval(0, figures.length - 1);
 
 		const newFigure = new Figure(
 			[(1 - this.size[0] % 2) / 2, (this.size[1] - this.cubeSize)/2, (1 - this.size[2] % 2) / 2],
 			figure.map(position => ({ position, color }))
 		);
 		newFigure.rotate(Axis.Y, randomIntFromInterval(0, 3)*90);
+
+		if (!newFigure.check.gameField(this.size, this.cubeSize)) {
+			this.createNewFigure(_color);
+			return;
+		}
 
 		if (newFigure.check.heap(this.heap, this.cubeSize)) {
 			this.figure = {

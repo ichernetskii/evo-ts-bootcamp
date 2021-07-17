@@ -88,3 +88,27 @@ export function vectorRotate(vector: Vector, axis: Axis, angle: number): Vector 
 
     return matrixMultiplyVector(rotationMatrix, vector);
 }
+
+export function throttle(fn: Function, ms: number, runLast = true) {
+    let canRun = true;
+    let storedThis: any;
+    let storedArgs: any[];
+
+    return function (...args: any[]) {
+        if (canRun) {
+            canRun = false;
+
+            setTimeout(() => {
+                canRun = true;
+                if (runLast) return fn.apply(storedThis, storedArgs);
+            }, ms);
+
+            return fn.apply(this, args);
+        } else {
+            if (runLast) {
+                storedThis = this;
+                storedArgs = args;
+            }
+        }
+    }
+}

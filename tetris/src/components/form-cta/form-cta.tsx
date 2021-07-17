@@ -2,7 +2,6 @@ import * as React from "react";
 import {observer} from "mobx-react-lite";
 import cn from "classnames";
 import {useStore} from "../../store/store";
-import {IGameState} from "../../classes/game-state";
 
 // CSS
 import s from "./form-cta.module.scss";
@@ -27,31 +26,58 @@ const FormCta: React.FC<{}> = observer(() => {
                 <header className={s["form__header"]}>Options</header>
                 <div className={s.toolbox}>
                     <label>
-                        X: <input
-                        type="number"
-                        min="2"
-                        max="20"
-                        value={publisherStore.get("getState").size[0]}
-                        onChange={e => publisherStore.dispatch("changeGameFieldSize")(Axis.X, parseInt(e.target.value))}
-                    />
+                        Depth: {publisherStore.get("getState").size[0]}
+                        <input
+                            type="range"
+                            min="2"
+                            max="20"
+                            value={publisherStore.get("getState").size[0]}
+                            onChange={e => publisherStore.dispatch("changeGameFieldSize")(Axis.X, parseInt(e.target.value))}
+                        />
                     </label>
                     <label>
-                        Y: <input
-                        type="number"
-                        min="2"
-                        max="20"
-                        value={publisherStore.get("getState").size[1]}
-                        onChange={e => publisherStore.dispatch("changeGameFieldSize")(Axis.Y, parseInt(e.target.value))}
-                    />
+                        Height: {publisherStore.get("getState").size[1]}
+                        <input
+                            type="range"
+                            min="4"
+                            max="20"
+                            value={publisherStore.get("getState").size[1]}
+                            onChange={e => publisherStore.dispatch("changeGameFieldSize")(Axis.Y, parseInt(e.target.value))}
+                        />
                     </label>
                     <label>
-                        Z: <input
-                        type="number"
-                        min="2"
-                        max="20"
-                        value={publisherStore.get("getState").size[2]}
-                        onChange={e => publisherStore.dispatch("changeGameFieldSize")(Axis.Z, parseInt(e.target.value))}
-                    />
+                        Width: {publisherStore.get("getState").size[2]}
+                        <input
+                            type="range"
+                            min="2"
+                            max="20"
+                            value={publisherStore.get("getState").size[2]}
+                            onChange={e => publisherStore.dispatch("changeGameFieldSize")(Axis.Z, parseInt(e.target.value))}
+                        />
+                    </label>
+                    <label>
+                        Alpha: {publisherStore.get("getState").camera.alpha}
+                        <input
+                            type="range"
+                            min="0"
+                            max="180"
+                            value={publisherStore.get("getState").camera.alpha}
+                            onChange={e => publisherStore.dispatch("setCameraPosition")(
+                                parseInt(e.target.value), publisherStore.get("getState").camera.beta
+                            )}
+                        />
+                    </label>
+                    <label>
+                        Beta: {publisherStore.get("getState").camera.beta}
+                        <input
+                            type="range"
+                            min="0"
+                            max="180"
+                            value={publisherStore.get("getState").camera.beta}
+                            onChange={e => publisherStore.dispatch("setCameraPosition")(
+                                publisherStore.get("getState").camera.alpha, parseInt(e.target.value)
+                            )}
+                        />
                     </label>
                 </div>
                 <div className={s["form__description"]}>

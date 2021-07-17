@@ -13,6 +13,7 @@ const useMobX = () => {
             deleteLevels: gameStore.deleteLevels,
             rotateFigure: gameStore.rotateFigure,
             setDelay: (delay: typeof gameStore.delay.current) => gameStore.delay.current = delay,
+            setCameraPosition: (alpha: number, beta: number) => gameStore.camera = {...gameStore.camera, alpha, beta},
             startGame: () => gameStore.gameState = IGameState.Playing,
             getState: () => gameStore,
             getFigure: () => gameStore.figure,
@@ -59,6 +60,14 @@ const useMobX = () => {
                 () => {
                     publisher3D.dispatch("rerenderGround")();
                     publisher3D.dispatch("rerenderGameField")();
+                }
+            )
+
+            // update camera position
+            reaction(
+                () => toJS(publisherStore.get("getState").camera),
+                () => {
+                    publisher3D.dispatch("moveCamera")();
                 }
             )
         }

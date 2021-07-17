@@ -25,11 +25,6 @@ const LIGHT = {
     POSITION: [2, 20, 2],
     INTENSITY: 1
 }
-const CAMERA = {
-    ALPHA: 5*Math.PI/32,
-    BETA: 11*Math.PI/32,
-    RADIUS: 20
-}
 
 interface IMaterials {
     [key: string]: BABYLON.StandardMaterial
@@ -48,15 +43,16 @@ export class World3d {
     private start: number;
     public publisher3D = new Publisher({
         getFigure: () => this.figure,
-        setFigure: (figure: BABYLON.Mesh[]) => { this.figure = figure },
+        setFigure: (figure: BABYLON.Mesh[]) => this.figure = figure,
         rerenderFigure: () => this.rerenderFigure(),
         updateFigure: () => this.updateFigure(),
-        rerenderFinalFigure:() => this.rerenderFinalFigure(),
+        rerenderFinalFigure: () => this.rerenderFinalFigure(),
         updateFinalFigure: () => this.updateFinalFigure(),
         rerenderHeap: () => this.rerenderHeap(),
         updateHeap: () => this.updateHeap(),
         rerenderGround: () => this.rerenderGround(),
-        rerenderGameField: () => this.rerenderGameField()
+        rerenderGameField: () => this.rerenderGameField(),
+        moveCamera: () => this.moveCamera()
     });
 
     public constructor(canvas: HTMLCanvasElement, private publisherStore: Publisher<IListeners>) {
@@ -86,72 +82,73 @@ export class World3d {
             }
         });
 
-        this.scene.onKeyboardObservable.add((kbInfo) => {
-            if (this.publisherStore.get("getState").gameState === IGameState.Playing) {
-                switch (kbInfo.type) {
-                    case BABYLON.KeyboardEventTypes.KEYDOWN:
-                        switch (kbInfo.event.keyCode) {
-                            // up
-                            case KeyboardKeys.Up:
-                                this.publisherStore.dispatch("moveFigure")(Axis.X, -1);
-                                break;
-                            // down
-                            case KeyboardKeys.Down:
-                                this.publisherStore.dispatch("moveFigure")(Axis.X, 1);
-                                break;
-                            // right
-                            case KeyboardKeys.Right:
-                                this.publisherStore.dispatch("moveFigure")(Axis.Z, 1);
-                                break;
-                            // left
-                            case KeyboardKeys.Left:
-                                this.publisherStore.dispatch("moveFigure")(Axis.Z, -1);
-                                break;
-                            // space
-                            case KeyboardKeys.Space:
-                                this.publisherStore.dispatch("setDelay")(this.publisherStore.get("getState").delay.fast);
-                                break;
-                            // rotate +X
-                            case KeyboardKeys.Q:
-                                this.publisherStore.dispatch("rotateFigure")(Axis.X, 90);
-                                break;
-                            // rotate -X
-                            case KeyboardKeys.A:
-                                this.publisherStore.dispatch("rotateFigure")(Axis.X, -90);
-                                break;
-                            // rotate +Y
-                            case KeyboardKeys.W:
-                                this.publisherStore.dispatch("rotateFigure")(Axis.Y, 90);
-                                break;
-                            // rotate -Y
-                            case KeyboardKeys.S:
-                                this.publisherStore.dispatch("rotateFigure")(Axis.Y, -90);
-                                break;
-                            // rotate +Z
-                            case KeyboardKeys.E:
-                                this.publisherStore.dispatch("rotateFigure")(Axis.Z, 90);
-                                break;
-                            // rotate -Z
-                            case KeyboardKeys.D:
-                                this.publisherStore.dispatch("rotateFigure")(Axis.Z, -90);
-                                break;
-                        }
-                        break;
-                    case BABYLON.KeyboardEventTypes.KEYUP:
-                        switch (kbInfo.event.keyCode) {
-                            case KeyboardKeys.Space:
-                                this.publisherStore.dispatch("setDelay")(this.publisherStore.get("getState").delay.normal);
-                                break;
-                        }
-
-                        break;
-                }
-            }
-        });
+        this.scene.onKeyboardObservable.add(this.onKeyboardClick.bind(this));
 
         engine.runRenderLoop(() => {
             this.scene.render();
         });
+    }
+
+    onKeyboardClick(kbInfo: BABYLON.KeyboardInfo) {
+        if (this.publisherStore.get("getState").gameState === IGameState.Playing) {
+            switch (kbInfo.type) {
+                case BABYLON.KeyboardEventTypes.KEYDOWN:
+                    switch (kbInfo.event.keyCode) {
+                        // up
+                        case KeyboardKeys.Up:
+                            this.publisherStore.dispatch("moveFigure")(Axis.X, -1);
+                            break;
+                        // down
+                        case KeyboardKeys.Down:
+                            this.publisherStore.dispatch("moveFigure")(Axis.X, 1);
+                            break;
+                        // right
+                        case KeyboardKeys.Right:
+                            this.publisherStore.dispatch("moveFigure")(Axis.Z, 1);
+                            break;
+                        // left
+                        case KeyboardKeys.Left:
+                            this.publisherStore.dispatch("moveFigure")(Axis.Z, -1);
+                            break;
+                        // space
+                        case KeyboardKeys.Space:
+                            this.publisherStore.dispatch("setDelay")(this.publisherStore.get("getState").delay.fast);
+                            break;
+                        // rotate +X
+                        case KeyboardKeys.Q:
+                            this.publisherStore.dispatch("rotateFigure")(Axis.X, 90);
+                            break;
+                        // rotate -X
+                        case KeyboardKeys.A:
+                            this.publisherStore.dispatch("rotateFigure")(Axis.X, -90);
+                            break;
+                        // rotate +Y
+                        case KeyboardKeys.W:
+                            this.publisherStore.dispatch("rotateFigure")(Axis.Y, 90);
+                            break;
+                        // rotate -Y
+                        case KeyboardKeys.S:
+                            this.publisherStore.dispatch("rotateFigure")(Axis.Y, -90);
+                            break;
+                        // rotate +Z
+                        case KeyboardKeys.E:
+                            this.publisherStore.dispatch("rotateFigure")(Axis.Z, 90);
+                            break;
+                        // rotate -Z
+                        case KeyboardKeys.D:
+                            this.publisherStore.dispatch("rotateFigure")(Axis.Z, -90);
+                            break;
+                    }
+                    break;
+                case BABYLON.KeyboardEventTypes.KEYUP:
+                    switch (kbInfo.event.keyCode) {
+                        case KeyboardKeys.Space:
+                            this.publisherStore.dispatch("setDelay")(this.publisherStore.get("getState").delay.normal);
+                            break;
+                    }
+                break;
+            }
+        }
     }
 
     rerenderFigure() {
@@ -212,9 +209,9 @@ export class World3d {
     private createCamera(canvas: HTMLCanvasElement): BABYLON.ArcRotateCamera {
         const camera = new BABYLON.ArcRotateCamera(
             "camera",
-            CAMERA.ALPHA,
-            CAMERA.BETA,
-            CAMERA.RADIUS,
+            this.publisherStore.get("getState").camera.alpha * (Math.PI/180),
+            this.publisherStore.get("getState").camera.beta * (Math.PI/180),
+            this.publisherStore.get("getState").camera.radius,
             BABYLON.Vector3.Zero(),
             this.scene
         );
@@ -223,6 +220,11 @@ export class World3d {
         camera.inputs.remove(camera.inputs.attached.keyboard);
         camera.inputs.remove(camera.inputs.attached.mousewheel);
         return camera;
+    }
+
+    moveCamera() {
+        this.camera.alpha = this.publisherStore.get("getState").camera.alpha * (Math.PI/180);
+        this.camera.beta = this.publisherStore.get("getState").camera.beta * (Math.PI/180);
     }
 
     private createLight(): BABYLON.HemisphericLight {
@@ -280,17 +282,20 @@ export class World3d {
         const cubeScene = BABYLON.MeshBuilder.CreateBox("cube", { size: this.publisherStore.get("getState").cubeSize });
         cubeScene.position = new BABYLON.Vector3(...cube.position);
         cubeScene.material = this.coloredMaterials[(transparent ? "T" : "") + cube.color];
-        // cubeScene.material.transparencyMode = BABYLON.Material.MATERIAL_ALPHABLEND;
         return cubeScene;
     }
 
     private createFigureFromState(): BABYLON.Mesh[] {
         const figureScene: BABYLON.Mesh[] = [];
         for(const cube of this.publisherStore.get("getState").figure.cubes) {
-            figureScene.push(this.createCube({
+            const cube3D = this.createCube({
                 position: vectorPlusVector(cube.position, this.publisherStore.get("getState").figure.position),
                 color: cube.color
-            }));
+            });
+            cube3D.enableEdgesRendering();
+            cube3D.edgesWidth = 6;
+            cube3D.edgesColor = new BABYLON.Color4(...[255, 255, 255, 0.2]);
+            figureScene.push(cube3D);
         }
         return figureScene;
     }
@@ -298,10 +303,14 @@ export class World3d {
     private createFinalFigureFromState(): BABYLON.Mesh[] {
         const finalFigureScene: BABYLON.Mesh[] = [];
         for(const cube of this.publisherStore.get("getState").finalFigure.cubes) {
-            finalFigureScene.push(this.createCube({
+            const cube3D = this.createCube({
                 position: vectorPlusVector(cube.position, this.publisherStore.get("getState").finalFigure.position),
                 color: cube.color
-            }, true));
+            }, true);
+            cube3D.enableEdgesRendering();
+            cube3D.edgesWidth = 2;
+            cube3D.edgesColor = new BABYLON.Color4(...[255, 255, 255, 0.3]);
+            finalFigureScene.push(cube3D);
         }
         return finalFigureScene;
     }
@@ -317,7 +326,7 @@ export class World3d {
     private createMaterial(hex: string, transparent = false) {
         const material = new BABYLON.StandardMaterial(`coloredMaterial:${hex}`, this.scene);
         material.diffuseColor = BABYLON.Color3.FromHexString(hex);
-        if (transparent) material.alpha = 0.4;
+        if (transparent) material.alpha = 0.3;
         return material;
     }
 
