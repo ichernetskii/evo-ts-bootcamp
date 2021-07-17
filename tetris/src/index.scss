@@ -6,8 +6,9 @@
   font-family: $font-family-base !important;
   font-weight: $font-weight;
   font-size: $font-size-base;
+  overscroll-behavior: none;
 }
 
 body {
-
+  overscroll-behavior: none;
 }
