@@ -5,6 +5,8 @@ import {Publisher} from "./observer";
 import {IGameState} from "./game-state";
 import {IListenersStore} from "./listeners.store";
 import {IListeners3D} from "./listeners.3D";
+import {throttle} from "../assets/utils";
+import {log} from "../../../lessons/14-network/007-react-keyboard/src/services/api";
 
 const GAMEFIELD_WIDTH = 4.0;
 const GAMEFIELD_COLOR = [255, 255, 255, 0.2];
@@ -77,41 +79,45 @@ export class World3d {
             }
         });
 
-        this.scene.onPointerObservable.add(pointerInfo => {
-            if (
-                pointerInfo.type === BABYLON.PointerEventTypes.POINTERMOVE &&
-                pointerInfo.event.buttons === 1 &&
-                this.publisherStore.get("getGameState") !== IGameState.Playing
-            ) {
-                this.publisherStore.dispatch("setCamera")({
-                    alpha: this.camera.alpha * (180 / Math.PI),
-                    beta: this.camera.beta  * (180 / Math.PI),
-                    radius: this.camera.radius
-                });
-            }
-        });
+        this.scene.onPointerObservable.add(throttle(
+            (pointerInfo: BABYLON.PointerInfo) => {
+                if (
+                    pointerInfo.type === BABYLON.PointerEventTypes.POINTERMOVE &&
+                    pointerInfo.event.buttons === 1 &&
+                    this.publisherStore.get("getGameState") !== IGameState.Playing
+                ) {
+                    this.publisherStore.dispatch("setCamera")({
+                        alpha: this.camera.alpha * (180 / Math.PI),
+                        beta: this.camera.beta  * (180 / Math.PI),
+                        radius: this.camera.radius
+                    });
+                }
+            },
+            200,
+            true
+        ));
 
         engine.runRenderLoop(() => {
             this.scene.render();
         });
     }
 
-    rerenderFigure() {
+    private rerenderFigure() {
         this.figure.forEach(f => f.dispose());
         this.figure = this.createFigureFromState();
     }
 
-    rerenderFinalFigure() {
+    private rerenderFinalFigure() {
         this.finalFigure.forEach(f => f.dispose());
         this.finalFigure = this.createFinalFigureFromState();
     }
 
-    rerenderHeap() {
+    private rerenderHeap() {
         this.heap.forEach(f => f.dispose());
         this.heap = this.createHeapFromState();
     }
 
-    updateFigure() {
+    private updateFigure() {
         this.figure.forEach((cube, idx) => {
             cube.position = new BABYLON.Vector3(...
                 vectorPlusVector(
@@ -123,7 +129,7 @@ export class World3d {
         });
     }
 
-    updateFinalFigure() {
+    private updateFinalFigure() {
         this.finalFigure.forEach((cube, idx) => {
             cube.position = new BABYLON.Vector3(...
                 vectorPlusVector(
@@ -135,18 +141,18 @@ export class World3d {
         })
     }
 
-    updateHeap() {
+    private updateHeap() {
         this.heap.forEach((cube, idx) => {
             cube.position = new BABYLON.Vector3(...this.publisherStore.get("getHeap")[idx].position);
         });
     }
 
-    rerenderGround() {
+    private rerenderGround() {
         this.ground.dispose();
         this.ground = this.createGround();
     }
 
-    rerenderGameField() {
+    private rerenderGameField() {
         this.gameField.dispose();
         this.gameField = this.createGameField();
     }
@@ -167,7 +173,7 @@ export class World3d {
         return camera;
     }
 
-    updateGameState() {
+    private updateGameState() {
         if (this.publisherStore.get("getGameState") === IGameState.Playing) {
             this.camera.inputs.remove(this.camera.inputs.attached.pointers);
             this.camera.inputs.remove(this.camera.inputs.attached.mousewheel);

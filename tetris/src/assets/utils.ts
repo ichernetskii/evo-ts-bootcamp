@@ -1,4 +1,4 @@
-export const randomHEXColor = (): string => "#" + Math.floor(Math.random()*16777215).toString(16);
+export const randomHEXColor = (): string => "#" + Math.floor(Math.random()*0xFFFFFF).toString(16);
 
 // min and max included
 export function randomIntFromInterval(min: number, max: number): number {
