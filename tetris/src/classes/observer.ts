@@ -23,13 +23,13 @@ export interface IListeners {
 export class Publisher<L extends IListeners> {
     constructor(private listeners: L) {};
 
-    subscribe<K extends keyof L>(event: K, fn: L[typeof event]): void {
-        this.listeners[event] = fn;
-    }
-
-    unsubscribe<K extends keyof L>(event: K): void {
-        delete this.listeners[event]
-    }
+    // subscribe<K extends keyof L>(event: K, fn: L[typeof event]): void {
+    //     this.listeners[event] = fn;
+    // }
+    //
+    // unsubscribe<K extends keyof L>(event: K): void {
+    //     delete this.listeners[event]
+    // }
 
     dispatch<K extends keyof L>(event: K) {
         return (...eventArgs: Parameters<L[typeof event]>) => this.listeners[event](...eventArgs);

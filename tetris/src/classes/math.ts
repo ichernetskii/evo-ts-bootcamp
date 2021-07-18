@@ -1,12 +1,3 @@
-export enum Axis {
-    X,
-    Y,
-    Z
-}
-
-export type Vector = [x: number, y: number, z: number];
-export type Matrix = [Vector, Vector, Vector]; // m[x][y]
-
 /**
  * Rounds value by specific step
  * @param {number} value Value to be rounded
@@ -21,6 +12,15 @@ export function round(value: number, step: number = 0.5): number {
     return Math.round(value * inv) / inv;
 }
 
+export enum Axis {
+    X,
+    Y,
+    Z
+}
+
+export type Vector = [x: number, y: number, z: number];
+export type Matrix = [Vector, Vector, Vector]; // m[x][y]
+
 /**
  * Rounds vector coordinates by specific step
  * @param vector Vector to be rounded
@@ -28,13 +28,6 @@ export function round(value: number, step: number = 0.5): number {
  */
 export function roundVector(vector: Vector, step: number = 0.5): Vector {
     return vector.map(v => round(v)) as Vector;
-}
-
-export const randomHEXColor = (): string => "#" + Math.floor(Math.random()*16777215).toString(16);
-
-// min and max included
-export function randomIntFromInterval(min: number, max: number): number {
-    return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
 export function matrixMultiplyVector(m: Matrix, v: Vector): Vector {
@@ -56,10 +49,6 @@ export function vectorPlusVector(v1: Vector, v2: Vector): Vector {
         v1[2] + v2[2]
     ];
 }
-
-// export function getMinYFigure(figure: IFigure) {
-//     return figure.position[1] + Math.min(...figure.cubes.map(cube => cube.position[1]));
-// }
 
 /**
  * Rotates vector
@@ -87,28 +76,4 @@ export function vectorRotate(vector: Vector, axis: Axis, angle: number): Vector 
     }
 
     return matrixMultiplyVector(rotationMatrix, vector);
-}
-
-export function throttle(fn: Function, ms: number, runLast = true) {
-    let canRun = true;
-    let storedThis: any;
-    let storedArgs: any[];
-
-    return function (...args: any[]) {
-        if (canRun) {
-            canRun = false;
-
-            setTimeout(() => {
-                canRun = true;
-                if (runLast) return fn.apply(storedThis, storedArgs);
-            }, ms);
-
-            return fn.apply(this, args);
-        } else {
-            if (runLast) {
-                storedThis = this;
-                storedArgs = args;
-            }
-        }
-    }
 }

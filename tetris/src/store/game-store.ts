@@ -1,9 +1,10 @@
 import {action, makeAutoObservable, observable} from "mobx";
-import {Axis, randomIntFromInterval, roundVector, Vector, vectorPlusVector} from "../classes/math";
+import {Axis, roundVector, Vector, vectorPlusVector} from "../classes/math";
 import {Figure, IFigure} from "../classes/figure";
 import {ICube} from "../classes/cube";
 import {colors, figures} from "./figures";
 import {IGameState} from "../classes/game-state";
+import {randomIntFromInterval} from "../assets/utils";
 
 class GameStore {
 	readonly colors: string[] = colors;

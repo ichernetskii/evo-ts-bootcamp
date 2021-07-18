@@ -8,7 +8,7 @@ import s from "./form-cta.module.scss";
 import {Axis} from "../../classes/math";
 import {Publisher} from "../../classes/observer";
 import useMobX from "../../classes/observer.MobX";
-import {runInAction} from "mobx";
+import {mobileAndTabletCheck} from "../../assets/utils";
 
 const FormCta: React.FC<{}> = observer(() => {
     const appStore = useStore("appStore");
@@ -19,6 +19,8 @@ const FormCta: React.FC<{}> = observer(() => {
         publisherStore.dispatch("gameStatePlay")();
         appStore.popupVisibleToggle();
     }
+
+    const isMobile = mobileAndTabletCheck();
 
     return (
         <div className={cn(s["form-cta"], {[s["form-cta_visible"]]: appStore.isPopupVisible})} onClick={close}>
@@ -58,11 +60,10 @@ const FormCta: React.FC<{}> = observer(() => {
                     </label>
                 </div>
                 <div className={s["form__description"]}>
-                    <div className={s["form__line"]}>rotate X:  Q, A</div>
-                    <div className={s["form__line"]}>rotate Y:  W, S</div>
-                    <div className={s["form__line"]}>rotate Z:  E, D</div>
-                    <div className={s["form__line"]}>move:      ←, →, ↑, ↓</div>
-                    <div className={s["form__line"]}>speed-up:  space</div>
+                    <div className={s["form__line"]}>figure rotation:  {isMobile ? "buttons" : "Q, W, E"}</div>
+                    <div className={s["form__line"]}>scene rotation: pause + {isMobile ? "swipe" : "mouse move"}</div>
+                    <div className={s["form__line"]}>figure move: {isMobile ? "swipe" : "←, →, ↑, ↓"}</div>
+                    <div className={s["form__line"]}>speed-up: {isMobile ? "two-fingers tap" : "space"}</div>
                 </div>
             </div>
         </div>

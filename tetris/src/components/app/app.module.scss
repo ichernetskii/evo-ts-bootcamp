@@ -1,7 +1,10 @@
 @import "src/style/variables.scss";
 
+$bgColor: #33334C;
+
 body {
   margin: 0;
+  background-color: $bgColor;
 }
 
 .app {
@@ -19,7 +22,7 @@ body {
 }
 
 .toolbox {
-  margin-top: 30px;
+  margin-top: 15px;
   position: absolute;
   color: #FFF;
   width: 90%;
@@ -27,12 +30,13 @@ body {
   &__block {
     display: flex;
     justify-content: space-between;
+    align-items: center;
   }
 
   &__info {
     display: flex;
     align-items: center;
-    margin-top: -30px;
+    // margin-top: -15px;
   }
 
   &__score {
@@ -44,62 +48,80 @@ body {
     width: 100px;
   }
 
-  &__button {
-    background-color: #C6C6C6;
-    font-size: $font-size-h4;
-    border: 0;
-    box-sizing: border-box;
+  &__settings {
+    width: 45px;
+    height: 45px;
     cursor: pointer;
-    color: #000;
-    width: 110px;
-    max-height: 45px;
-    padding: 6px 0;
-    transition: all 0.15s linear;
-    user-select: none;
-    border-radius: 5px;
+    transition: transform 0.5s cubic-bezier(0.33, 1, 0.68, 1);
 
-    @media (hover: hover) {
-      &:hover {
-        background-color: #AAA;
-        color: #FFF;
-      }
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    &:hover {
+      transform: rotateZ(120deg);
     }
   }
 
-  @media screen and (max-width: 600px) {
-    &__score {
-      margin-right: 10px;
-    }
+  //&__button {
+  //  background-color: #C6C6C6;
+  //  font-size: $font-size-h4;
+  //  border: 0;
+  //  box-sizing: border-box;
+  //  cursor: pointer;
+  //  color: #000;
+  //  width: 110px;
+  //  max-height: 45px;
+  //  padding: 6px 0;
+  //  transition: all 0.15s linear;
+  //  user-select: none;
+  //  border-radius: 5px;
+  //  box-shadow:
+  //          0 0 5px rgba(129, 129, 132, 0.25),
+  //          inset 1px 1px 3px 1px rgba(255, 255, 255, 0.85),
+  //          inset -2px -2px 3px rgb(38, 38, 38);
+  //
+  //  @media (hover: hover) {
+  //    &:hover {
+  //      background-color: #9a9a9a;
+  //    }
+  //  }
+  //
+  //  &_pressed {
+  //    box-shadow: none;
+  //  }
+  //}
 
-    &__figure {
-      margin-left: 10px;
-      width: 65px;
-    }
-
-    &__button {
-      font-size: $font-size-h5;
-      width: 80px;
-    }
-  }
+  //@media screen and (max-width: 600px) {
+  //  &__score {
+  //    margin-right: 10px;
+  //  }
+  //
+  //  &__figure {
+  //    margin-left: 10px;
+  //    width: 65px;
+  //  }
+  //
+  //  &__button {
+  //    font-size: $font-size-h5;
+  //    width: 80px;
+  //  }
+  //}
 
   @media screen and (max-width: 430px) {
-    width: 100%;
-
     &__score {
-      margin-right: 0;
+      margin-right: 5px;
     }
 
     &__figure {
-      margin-left: 0;
-    }
-
-    &__button {
-      margin: 0 10px;
+      margin-left: 5px;
     }
   }
 }
 
 canvas {
+  padding-top: 30px;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
@@ -117,28 +139,109 @@ canvas {
   @media (hover: none) {
     display: flex;
   }
+}
 
-  button {
-    width: 50px;
-    height: 50px;
-    cursor: pointer;
-    border: 0;
-    padding: 6px;
-    border-radius: 5px;
-    user-select: none;
+.button {
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  border: 0;
+  padding: 3px;
+  user-select: none;
+  border-radius: 6px;
 
-    svg {
-      width: 100%;
-      height: 100%;
+  &_x {
+    background-color: #73cece;
+    box-shadow:
+            0 0 5px rgba(129, 129, 132, 0.25),
+            inset 1px 1px 3px 1px rgba(255, 255, 255, 0.85),
+            inset -2px -2px 3px rgba(25, 100, 116);
+  }
+
+  &_y {
+    background-color: #D4ACC9;
+    box-shadow:
+            0 0 5px rgba(129, 129, 132, 0.25),
+            inset 1px 1px 3px 1px rgba(255, 255, 255, 0.85),
+            inset -2px -2px 3px rgba(152, 61, 105);
+  }
+
+  &_z {
+    background-color: #F08F66;
+    box-shadow:
+            0 0 5px rgba(129, 129, 132, 0.25),
+            inset 1px 1px 3px 1px rgba(255, 255, 255, 0.85),
+            inset -2px -2px 3px rgba(163, 75, 47);
+  }
+
+  &:active {
+    box-shadow: none;
+  }
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.btnPlay {
+  $btnPlay-width: 45px;
+  $btnPlay-height: 45px;
+  width: $btnPlay-width;
+  height: $btnPlay-height;
+  display: block;
+  // margin: 60px auto;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+
+  &__left {
+    height: 100%;
+    float: left;
+    background-color: #fff;
+    width: 36%;
+    transition: all 0.25s ease;
+    overflow: hidden;
+  }
+  &__triangle1 {
+    transform: translate(0, -100%);
+  }
+  &__triangle2 {
+    transform: translate(0, 100%);
+  }
+  &__triangle1,
+  &__triangle2 {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: transparent;
+    width: 0;
+    height: 0;
+    border-right: $btnPlay-width solid $bgColor;
+    border-top: $btnPlay-height/2 solid transparent;
+    border-bottom: $btnPlay-height/2 solid transparent;
+    transition: transform 0.25s ease;
+  }
+  &__right {
+    height: 100%;
+    float: right;
+    width: 36%;
+    background-color: #fff;
+    transition: all 0.25s ease;
+  }
+
+  &_paused {
+    .btnPlay__left {
+      width: 50%;
     }
-
-    &:hover {
-      background-color: #AAA;
-      color: #FFF;
-
-      svg path {
-        fill: #FFF;
-      }
+    .btnPlay__right {
+      width: 50%;
+    }
+    .btnPlay__triangle1 {
+      transform: translate(0, -50%);
+    }
+    .btnPlay__triangle2 {
+      transform: translate(0, 50%);
     }
   }
 }
