@@ -36,7 +36,6 @@ body {
   &__info {
     display: flex;
     align-items: center;
-    // margin-top: -15px;
   }
 
   &__score {
@@ -63,51 +62,6 @@ body {
       transform: rotateZ(120deg);
     }
   }
-
-  //&__button {
-  //  background-color: #C6C6C6;
-  //  font-size: $font-size-h4;
-  //  border: 0;
-  //  box-sizing: border-box;
-  //  cursor: pointer;
-  //  color: #000;
-  //  width: 110px;
-  //  max-height: 45px;
-  //  padding: 6px 0;
-  //  transition: all 0.15s linear;
-  //  user-select: none;
-  //  border-radius: 5px;
-  //  box-shadow:
-  //          0 0 5px rgba(129, 129, 132, 0.25),
-  //          inset 1px 1px 3px 1px rgba(255, 255, 255, 0.85),
-  //          inset -2px -2px 3px rgb(38, 38, 38);
-  //
-  //  @media (hover: hover) {
-  //    &:hover {
-  //      background-color: #9a9a9a;
-  //    }
-  //  }
-  //
-  //  &_pressed {
-  //    box-shadow: none;
-  //  }
-  //}
-
-  //@media screen and (max-width: 600px) {
-  //  &__score {
-  //    margin-right: 10px;
-  //  }
-  //
-  //  &__figure {
-  //    margin-left: 10px;
-  //    width: 65px;
-  //  }
-  //
-  //  &__button {
-  //    font-size: $font-size-h5;
-  //    width: 80px;
-  //  }
-  //}
 
   @media screen and (max-width: 430px) {
     &__score {
@@ -190,7 +144,6 @@ canvas {
   width: $btnPlay-width;
   height: $btnPlay-height;
   display: block;
-  // margin: 60px auto;
   overflow: hidden;
   position: relative;
   cursor: pointer;
@@ -218,8 +171,8 @@ canvas {
     width: 0;
     height: 0;
     border-right: $btnPlay-width solid $bgColor;
-    border-top: $btnPlay-height/2 solid transparent;
-    border-bottom: $btnPlay-height/2 solid transparent;
+    border-top: 0.5 * $btnPlay-height solid transparent;
+    border-bottom: 0.5 * $btnPlay-height solid transparent;
     transition: transform 0.25s ease;
   }
   &__right {

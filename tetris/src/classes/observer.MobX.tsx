@@ -1,7 +1,9 @@
 import {reaction, toJS} from "mobx";
 import {useStore} from "../store/store";
-import {IListeners, Publisher} from "./observer";
-import {IGameState} from "./game-state";
+import {Publisher} from "./observer";
+import {IListeners3D} from "./listeners.3D";
+import {IListenersStore} from "./listeners.store";
+import {ICamera} from "./camera";
 
 const useMobX = () => {
     const gameStore = useStore("gameStore");
@@ -16,13 +18,21 @@ const useMobX = () => {
             gameStatePause: gameStore.gameStatePause,
             gameStatePlay: gameStore.gameStatePlay,
             setDelay: (delay: typeof gameStore.delay.current) => gameStore.delay.current = delay,
-            // setCameraPosition: (alpha: number, beta: number) => gameStore.camera = {...gameStore.camera, alpha, beta},
-            getState: () => gameStore,
             getFigure: () => gameStore.figure,
             getFinalFigure: () => gameStore.finalFigure,
             getHeap: () => gameStore.heap,
+            getDelay: () => gameStore.delay,
+            getGameState: () => gameStore.gameState,
+            getNextFigure: () => gameStore.nextFigure,
+            getScore: () => gameStore.score,
+            getGameFieldSize: () => gameStore.size,
+            getDeltaY: () => gameStore.dy,
+            getCamera: () => gameStore.camera,
+            setCamera: (camera: ICamera) => gameStore.camera = {...camera},
+            getCubeSize: () => gameStore.cubeSize,
+            getColors: () => gameStore.colors
         },
-        init: (publisherStore: Publisher<IListeners>, publisher3D: Publisher<IListeners>) => {
+        init: (publisherStore: Publisher<IListenersStore>, publisher3D: Publisher<IListeners3D>) => {
             // update figure (store → scene)
             reaction(
                 () => toJS(publisherStore.get("getFigure")),
@@ -58,25 +68,22 @@ const useMobX = () => {
 
             // update gameField & ground (store → gameField, ground)
             reaction(
-                () => toJS(publisherStore.get("getState").size),
+                () => toJS(publisherStore.get("getGameFieldSize")),
                 () => {
                     publisher3D.dispatch("rerenderGround")();
                     publisher3D.dispatch("rerenderGameField")();
                 }
             )
 
-            // update camera position
-            // reaction(
-            //     () => toJS(publisherStore.get("getState").camera),
-            //     () => {
-            //         publisher3D.dispatch("moveCamera")();
-            //     }
-            // )
-
             reaction(
-                () => toJS(publisherStore.get("getState").gameState),
+                () => toJS(publisherStore.get("getGameState")),
                 () => {
                     publisher3D.dispatch("updateGameState")();
+                    publisherStore.dispatch("setCamera")({
+                        alpha: publisher3D.get("getCamera").alpha * (180 / Math.PI),
+                        beta: publisher3D.get("getCamera").beta  * (180 / Math.PI),
+                        radius: publisher3D.get("getCamera").radius
+                    });
                 }
             )
         }

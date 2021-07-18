@@ -11,6 +11,7 @@ import {Axis} from "../../classes/math";
 import {useSwipeable} from "react-swipeable";
 import s from  "./app.module.scss";
 import cn from "classnames";
+import {IListenersStore} from "../../classes/listeners.store";
 
 enum KeyboardKeys {
     Space = 32,
@@ -26,12 +27,24 @@ enum KeyboardKeys {
     W = 87
 }
 
+function sign(alpha: number): number {
+    const cosAlpha = Math.cos(alpha);
+    const sqrt = Math.sqrt(2)/2;
+
+    if (-cosAlpha >= sqrt) { return 1 }
+    else {
+        if (-cosAlpha <= -sqrt) { return -1 } else { return 0 }
+    }
+}
+
 const App: React.FC = observer(() => {
     const {storeConfig, init} = useMobX();
     const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
     const world3d = React.useRef<World3d | null>(null);
     const appStore = useStore("appStore");
-    const publisherStore = new Publisher(storeConfig);
+    const publisherStore = new Publisher<IListenersStore>(storeConfig);
+    const signAlpha = () => sign(publisherStore.get("getCamera").alpha * (Math.PI / 180));
+    const signAlphaPlusPI = () =>  sign((publisherStore.get("getCamera").alpha + 90) * (Math.PI / 180));
     function getSVGFigure(type: number, color: string) {
         const SVGFigures = [
             <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -76,12 +89,12 @@ const App: React.FC = observer(() => {
     }
 
     function rotate(axis: Axis) {
-        if (publisherStore.get("getState").gameState === IGameState.Playing) {
+        if (publisherStore.get("getGameState") === IGameState.Playing) {
             publisherStore.dispatch("rotateFigure")(axis, 90);
         }
     }
-    const nextFigureColor = publisherStore.get("getState").nextFigure.color;
-    const nextFigureType = publisherStore.get("getState").nextFigure.type;
+    const nextFigureColor = publisherStore.get("getNextFigure").color;
+    const nextFigureType = publisherStore.get("getNextFigure").type;
     const nextFigure = getSVGFigure(nextFigureType, nextFigureColor);
 
     useLayoutEffect(() => {
@@ -95,8 +108,6 @@ const App: React.FC = observer(() => {
 
     const handlers = useSwipeable({
         onSwiped: (eventData) => {
-            console.log("onSwipe", eventData);
-
             enum Directions {
                 Up = "Up",
                 Down = "Down",
@@ -104,19 +115,23 @@ const App: React.FC = observer(() => {
                 Right = "Right"
             }
 
-            if (publisherStore.get("getState").gameState === IGameState.Playing) {
+            if (publisherStore.get("getGameState") === IGameState.Playing) {
                 switch (eventData.dir) {
                     case Directions.Up:
-                        publisherStore.dispatch("moveFigure")(Axis.X, -1);
+                        publisherStore.dispatch("moveFigure")(Axis.X, signAlpha());
+                        publisherStore.dispatch("moveFigure")(Axis.Z, -1*signAlphaPlusPI());
                         break;
                     case Directions.Down:
-                        publisherStore.dispatch("moveFigure")(Axis.X, 1);
-                        break;
-                    case Directions.Left:
-                        publisherStore.dispatch("moveFigure")(Axis.Z, -1);
+                        publisherStore.dispatch("moveFigure")(Axis.X, -1*signAlpha());
+                        publisherStore.dispatch("moveFigure")(Axis.Z, signAlphaPlusPI());
                         break;
                     case Directions.Right:
-                        publisherStore.dispatch("moveFigure")(Axis.Z, 1);
+                        publisherStore.dispatch("moveFigure")(Axis.X, -1 * signAlphaPlusPI());
+                        publisherStore.dispatch("moveFigure")(Axis.Z, -1 * signAlpha());
+                        break;
+                    case Directions.Left:
+                        publisherStore.dispatch("moveFigure")(Axis.X, signAlphaPlusPI());
+                        publisherStore.dispatch("moveFigure")(Axis.Z, signAlpha());
                         break;
                 }
             }
@@ -125,60 +140,57 @@ const App: React.FC = observer(() => {
     });
 
     const onKeyDownHandler = (e: React.KeyboardEvent): void => {
-        if (publisherStore.get("getState").gameState === IGameState.Playing) {
+        if (e.keyCode === KeyboardKeys.Q) {
+            console.log("alpha", publisherStore.get("getCamera").alpha);
+            console.log("beta", publisherStore.get("getCamera").beta);
+        }
+
+        if (publisherStore.get("getGameState") === IGameState.Playing) {
             switch (e.keyCode) {
                 case KeyboardKeys.Up:
-                    publisherStore.dispatch("moveFigure")(Axis.X, -1);
+                    publisherStore.dispatch("moveFigure")(Axis.X, signAlpha());
+                    publisherStore.dispatch("moveFigure")(Axis.Z, -1*signAlphaPlusPI());
                     break;
                 // down
                 case KeyboardKeys.Down:
-                    publisherStore.dispatch("moveFigure")(Axis.X, 1);
+                    publisherStore.dispatch("moveFigure")(Axis.X, -1*signAlpha());
+                    publisherStore.dispatch("moveFigure")(Axis.Z, signAlphaPlusPI());
                     break;
                 // right
                 case KeyboardKeys.Right:
-                    publisherStore.dispatch("moveFigure")(Axis.Z, 1);
+                    publisherStore.dispatch("moveFigure")(Axis.X, -1 * signAlphaPlusPI());
+                    publisherStore.dispatch("moveFigure")(Axis.Z, -1 * signAlpha());
                     break;
                 // left
                 case KeyboardKeys.Left:
-                    publisherStore.dispatch("moveFigure")(Axis.Z, -1);
+                    publisherStore.dispatch("moveFigure")(Axis.X, signAlphaPlusPI());
+                    publisherStore.dispatch("moveFigure")(Axis.Z, signAlpha());
                     break;
                 // space
                 case KeyboardKeys.Space:
-                    publisherStore.dispatch("setDelay")(publisherStore.get("getState").delay.fast);
+                    publisherStore.dispatch("setDelay")(publisherStore.get("getDelay").fast);
                     break;
                 // rotate +X
-                case KeyboardKeys.Q:
+                case KeyboardKeys.A:
                     publisherStore.dispatch("rotateFigure")(Axis.X, 90);
                     break;
-                // rotate -X
-                // case KeyboardKeys.A:
-                //     publisherStore.dispatch("rotateFigure")(Axis.X, -90);
-                //     break;
                 // rotate +Y
-                case KeyboardKeys.W:
+                case KeyboardKeys.S:
                     publisherStore.dispatch("rotateFigure")(Axis.Y, 90);
                     break;
-                // rotate -Y
-                // case KeyboardKeys.S:
-                //     publisherStore.dispatch("rotateFigure")(Axis.Y, -90);
-                //     break;
                 // rotate +Z
-                case KeyboardKeys.E:
+                case KeyboardKeys.D:
                     publisherStore.dispatch("rotateFigure")(Axis.Z, 90);
                     break;
-                // rotate -Z
-                // case KeyboardKeys.D:
-                //     publisherStore.dispatch("rotateFigure")(Axis.Z, -90);
-                //     break;
             }
         }
     }
 
     const onKeyUpHandler = (e: React.KeyboardEvent) => {
-        if (publisherStore.get("getState").gameState === IGameState.Playing) {
+        if (publisherStore.get("getGameState") === IGameState.Playing) {
             switch (e.keyCode) {
                 case KeyboardKeys.Space:
-                    publisherStore.dispatch("setDelay")(publisherStore.get("getState").delay.normal);
+                    publisherStore.dispatch("setDelay")(publisherStore.get("getDelay").normal);
                     break;
             }
         }
@@ -186,12 +198,12 @@ const App: React.FC = observer(() => {
 
     const onTouchStartHandler = (e: React.TouchEvent) => {
         if (e.touches.length >= 2) {
-            publisherStore.dispatch("setDelay")(publisherStore.get("getState").delay.fast);
+            publisherStore.dispatch("setDelay")(publisherStore.get("getDelay").fast);
         }
     }
 
     const onTouchEndHandler = () => {
-        publisherStore.dispatch("setDelay")(publisherStore.get("getState").delay.normal);
+        publisherStore.dispatch("setDelay")(publisherStore.get("getDelay").normal);
     }
 
     const onOptionsClick = () => {
@@ -212,23 +224,12 @@ const App: React.FC = observer(() => {
             <FormCta />
             <div className={s.toolbox}>
                 <div className={s.toolbox__block}>
-                    {/*<button className={cn(s.toolbox__button, {[s.toolbox__button_pressed]: publisherStore.get("getState").gameState === IGameState.Playing})}
-                    onClick={publisherStore.get("getState").gameStateToggle}>*/}
-                    {/*    {*/}
-                    {/*        publisherStore.get("getState").gameState === IGameState.Playing*/}
-                    {/*            ? "Stop"*/}
-                    {/*            : <svg viewBox="0 0 165 165" fill="none" xmlns="http://www.w3.org/2000/svg">*/}
-                    {/*                <path d="M165 82.5C165 104.38 156.308 125.365 140.836 140.836C125.365 156.308 104.38 165 82.5 165C60.6196 165 39.6354 156.308 24.1637 140.836C8.69194 125.365 0 104.38 0 82.5C0 60.6196 8.69194 39.6354 24.1637 24.1637C39.6354 8.69194 60.6196 0 82.5 0C104.38 0 125.365 8.69194 140.836 24.1637C156.308 39.6354 165 60.6196 165 82.5V82.5ZM70.0219 52.5216C69.2509 51.9726 68.3437 51.6465 67.3996 51.5789C66.4556 51.5112 65.5111 51.7048 64.6698 52.1382C63.8284 52.5717 63.1226 53.2284 62.6296 54.0363C62.1367 54.8443 61.8756 55.7723 61.875 56.7188V108.281C61.8756 109.228 62.1367 110.156 62.6296 110.964C63.1226 111.772 63.8284 112.428 64.6698 112.862C65.5111 113.295 66.4556 113.489 67.3996 113.421C68.3437 113.354 69.2509 113.027 70.0219 112.478L106.116 86.6972C106.784 86.2202 107.329 85.5905 107.705 84.8605C108.081 84.1304 108.277 83.3211 108.277 82.5C108.277 81.6789 108.081 80.8696 107.705 80.1395C107.329 79.4095 106.784 78.7798 106.116 78.3028L70.0219 52.5216V52.5216Z" fill="#CACACA"/>*/}
-                    {/*            </svg>*/}
-                    {/*    }*/}
-                    {/*</button>*/}
-                    {/*<div className="btnPlay " onClick={publisherStore.get("getState").gameStateToggle}>*/}
                     <div
                         className={cn(
                             s.btnPlay,
-                            {[s.btnPlay_paused]: publisherStore.get("getState").gameState === IGameState.Playing}
+                            {[s.btnPlay_paused]: publisherStore.get("getGameState") !== IGameState.Playing}
                         )}
-                        onClick={publisherStore.get("getState").gameStateToggle}
+                        onClick={publisherStore.dispatch("gameStateToggle")}
                     >
                         <div className={s.btnPlay__left} />
                         <div className={s.btnPlay__right} />
@@ -237,9 +238,9 @@ const App: React.FC = observer(() => {
                     </div>
                     <div className={s.toolbox__info}>
                         <div className={s.toolbox__score} dangerouslySetInnerHTML={{
-                            __html: publisherStore.get("getState").gameState === IGameState.Loose
+                            __html: publisherStore.get("getGameState") === IGameState.Loose
                                 ? "Loose"
-                                : "Score:&nbsp;" + publisherStore.get("getState").score
+                                : "Score:&nbsp;" + publisherStore.get("getScore")
                         }} />
                         <div className={s.toolbox__figure}>
                             {nextFigure}
@@ -327,7 +328,6 @@ const App: React.FC = observer(() => {
                             strokeWidth="8"
                         />
                     </svg>
-
                 </button>
             </div>
         </div>

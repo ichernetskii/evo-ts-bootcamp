@@ -1,28 +1,19 @@
 import * as BABYLON from "babylonjs";
 import {Axis, vectorPlusVector} from "./math";
 import {ICube} from "./cube";
-import {IListeners, Publisher} from "./observer";
+import {Publisher} from "./observer";
 import {IGameState} from "./game-state";
+import {IListenersStore} from "./listeners.store";
+import {IListeners3D} from "./listeners.3D";
 
-// enum KeyboardKeys {
-//     Space = 32,
-//     Left = 37,
-//     Up = 38,
-//     Right = 39,
-//     Down = 40,
-//     A = 65,
-//     D = 68,
-//     E = 69,
-//     Q = 81,
-//     S = 83,
-//     W = 87
-// }
-
-const GROUND_MATERIAL = "#ff7700";
 const GAMEFIELD_WIDTH = 4.0;
 const GAMEFIELD_COLOR = [255, 255, 255, 0.2];
+const FINAL_FIGURE_WIDTH = 2.0;
+const FINAL_FIGURE_COLOR = [255, 255, 255, 0.4];
 const CUBES_BORDER_WIDTH = 6.0;
 const CUBES_BORDER_COLOR = [255, 255, 255, 0.2];
+const GROUND_ALPHA = 0.5;
+
 const LIGHT = {
     POSITION: [2, 20, 2],
     INTENSITY: 1
@@ -44,9 +35,9 @@ export class World3d {
     private finalFigure: BABYLON.Mesh[];
     private heap: BABYLON.Mesh[];
     private start: number;
-    public publisher3D = new Publisher({
+    public publisher3D = new Publisher<IListeners3D>({
         getFigure: () => this.figure,
-        setFigure: (figure: BABYLON.Mesh[]) => this.figure = figure,
+        getCamera: () => ({ alpha: this.camera.alpha, beta: this.camera.beta, radius: this.camera.radius }),
         rerenderFigure: () => this.rerenderFigure(),
         updateFigure: () => this.updateFigure(),
         rerenderFinalFigure: () => this.rerenderFinalFigure(),
@@ -55,11 +46,10 @@ export class World3d {
         updateHeap: () => this.updateHeap(),
         rerenderGround: () => this.rerenderGround(),
         rerenderGameField: () => this.rerenderGameField(),
-        // moveCamera: () => this.moveCamera(),
         updateGameState: () => this.updateGameState()
     });
 
-    public constructor(canvas: HTMLCanvasElement, private publisherStore: Publisher<IListeners>) {
+    public constructor(canvas: HTMLCanvasElement, private publisherStore: Publisher<IListenersStore>) {
         this.canvas = canvas;
         const engine = new BABYLON.Engine(canvas);
         this.scene = new BABYLON.Scene(engine);
@@ -74,16 +64,30 @@ export class World3d {
         this.heap = this.createHeapFromState();
         this.start = Date.now().valueOf();
 
-        canvas.addEventListener("resize", () => {
+        window.addEventListener("resize", () => {
             engine.resize();
         });
 
         this.scene.registerBeforeRender(() => {
             const progress = Date.now().valueOf() - this.start;
-            if (progress >= this.publisherStore.get("getState").delay.current && this.publisherStore.get("getState").gameState === IGameState.Playing) {
+            if (progress >= this.publisherStore.get("getDelay").current && this.publisherStore.get("getGameState") === IGameState.Playing) {
                 this.start = Date.now().valueOf();
-                this.publisherStore.dispatch("moveFigure")(Axis.Y, -this.publisherStore.get("getState").dy);
+                this.publisherStore.dispatch("moveFigure")(Axis.Y, -this.publisherStore.get("getDeltaY"));
                 this.publisherStore.dispatch("deleteLevels")();
+            }
+        });
+
+        this.scene.onPointerObservable.add(pointerInfo => {
+            if (
+                pointerInfo.type === BABYLON.PointerEventTypes.POINTERMOVE &&
+                pointerInfo.event.buttons === 1 &&
+                this.publisherStore.get("getGameState") !== IGameState.Playing
+            ) {
+                this.publisherStore.dispatch("setCamera")({
+                    alpha: this.camera.alpha * (180 / Math.PI),
+                    beta: this.camera.beta  * (180 / Math.PI),
+                    radius: this.camera.radius
+                });
             }
         });
 
@@ -111,11 +115,11 @@ export class World3d {
         this.figure.forEach((cube, idx) => {
             cube.position = new BABYLON.Vector3(...
                 vectorPlusVector(
-                    this.publisherStore.get("getState").figure.position,
-                    this.publisherStore.get("getState").figure.cubes[idx].position
+                    this.publisherStore.get("getFigure").position,
+                    this.publisherStore.get("getFigure").cubes[idx].position
                 )
             );
-            cube.material = this.coloredMaterials[this.publisherStore.get("getState").figure.cubes[idx].color];
+            cube.material = this.coloredMaterials[this.publisherStore.get("getFigure").cubes[idx].color];
         });
     }
 
@@ -123,17 +127,17 @@ export class World3d {
         this.finalFigure.forEach((cube, idx) => {
             cube.position = new BABYLON.Vector3(...
                 vectorPlusVector(
-                    this.publisherStore.get("getState").finalFigure.position,
-                    this.publisherStore.get("getState").finalFigure.cubes[idx].position
+                    this.publisherStore.get("getFinalFigure").position,
+                    this.publisherStore.get("getFinalFigure").cubes[idx].position
                 )
             );
-            cube.material = this.coloredMaterials["T" + this.publisherStore.get("getState").finalFigure.cubes[idx].color];
+            cube.material = this.coloredMaterials["T" + this.publisherStore.get("getFinalFigure").cubes[idx].color];
         })
     }
 
     updateHeap() {
         this.heap.forEach((cube, idx) => {
-            cube.position = new BABYLON.Vector3(...this.publisherStore.get("getState").heap[idx].position);
+            cube.position = new BABYLON.Vector3(...this.publisherStore.get("getHeap")[idx].position);
         });
     }
 
@@ -150,9 +154,9 @@ export class World3d {
     private createCamera(canvas: HTMLCanvasElement): BABYLON.ArcRotateCamera {
         const camera = new BABYLON.ArcRotateCamera(
             "camera",
-            this.publisherStore.get("getState").camera.alpha * (Math.PI/180),
-            this.publisherStore.get("getState").camera.beta * (Math.PI/180),
-            this.publisherStore.get("getState").camera.radius,
+            this.publisherStore.get("getCamera").alpha * (Math.PI/180),
+            this.publisherStore.get("getCamera").beta * (Math.PI/180),
+            this.publisherStore.get("getCamera").radius,
             BABYLON.Vector3.Zero(),
             this.scene
         );
@@ -163,13 +167,8 @@ export class World3d {
         return camera;
     }
 
-    // moveCamera() {
-    //     this.camera.alpha = this.publisherStore.get("getState").camera.alpha * (Math.PI/180);
-    //     this.camera.beta = this.publisherStore.get("getState").camera.beta * (Math.PI/180);
-    // }
-
     updateGameState() {
-        if (this.publisherStore.get("getState").gameState === IGameState.Playing) {
+        if (this.publisherStore.get("getGameState") === IGameState.Playing) {
             this.camera.inputs.remove(this.camera.inputs.attached.pointers);
             this.camera.inputs.remove(this.camera.inputs.attached.mousewheel);
         } else {
@@ -191,9 +190,9 @@ export class World3d {
 
     private createGameField() {
         const box = BABYLON.MeshBuilder.CreateBox("gameField", {
-            width: this.publisherStore.get("getState").size[0],
-            height: this.publisherStore.get("getState").size[1],
-            depth: this.publisherStore.get("getState").size[2]
+            width: this.publisherStore.get("getGameFieldSize")[0],
+            height: this.publisherStore.get("getGameFieldSize")[1],
+            depth: this.publisherStore.get("getGameFieldSize")[2]
         });
         box.position = BABYLON.Vector3.Zero();
         box.enableEdgesRendering();
@@ -211,23 +210,24 @@ export class World3d {
         const ground = BABYLON.GroundBuilder.CreateGround(
             "ground",
             {
-                width: this.publisherStore.get("getState").size[0],
-                height: this.publisherStore.get("getState").size[2]
+                width: this.publisherStore.get("getGameFieldSize")[0],
+                height: this.publisherStore.get("getGameFieldSize")[2]
             },
             this.scene
         );
-        ground.position.y = -this.publisherStore.get("getState").size[1] / 2;
+
+        // to disable z-fighting
+        ground.position.y = (-this.publisherStore.get("getGameFieldSize")[1] / 2) - 0.0001;
 
         const groundTexture = new BABYLON.Texture(require("@/images/logo.jpg"), this.scene);
-        groundTexture.uScale = this.publisherStore.get("getState").size[0];
-        groundTexture.vScale = this.publisherStore.get("getState").size[2];
+        groundTexture.uScale = this.publisherStore.get("getGameFieldSize")[0];
+        groundTexture.vScale = this.publisherStore.get("getGameFieldSize")[2];
         const groundMaterial = new BABYLON.StandardMaterial(
             "groundMaterial",
             this.scene
         );
         groundMaterial.diffuseTexture = groundTexture;
-        groundMaterial.diffuseColor = BABYLON.Color3.FromHexString("#FFFFFF");
-        groundMaterial.alpha = 0.5;
+        groundMaterial.alpha = GROUND_ALPHA;
         groundMaterial.backFaceCulling = false;
         ground.material = groundMaterial;
 
@@ -235,7 +235,7 @@ export class World3d {
     }
 
     private createCube = (cube: ICube, transparent = false): BABYLON.Mesh => {
-        const cubeScene = BABYLON.MeshBuilder.CreateBox("cube", { size: this.publisherStore.get("getState").cubeSize });
+        const cubeScene = BABYLON.MeshBuilder.CreateBox("cube", { size: this.publisherStore.get("getCubeSize") });
         cubeScene.position = new BABYLON.Vector3(...cube.position);
         cubeScene.material = this.coloredMaterials[(transparent ? "T" : "") + cube.color];
         return cubeScene;
@@ -243,9 +243,9 @@ export class World3d {
 
     private createFigureFromState(): BABYLON.Mesh[] {
         const figureScene: BABYLON.Mesh[] = [];
-        for(const cube of this.publisherStore.get("getState").figure.cubes) {
+        for(const cube of this.publisherStore.get("getFigure").cubes) {
             const cube3D = this.createCube({
-                position: vectorPlusVector(cube.position, this.publisherStore.get("getState").figure.position),
+                position: vectorPlusVector(cube.position, this.publisherStore.get("getFigure").position),
                 color: cube.color
             });
             cube3D.enableEdgesRendering();
@@ -258,14 +258,14 @@ export class World3d {
 
     private createFinalFigureFromState(): BABYLON.Mesh[] {
         const finalFigureScene: BABYLON.Mesh[] = [];
-        for(const cube of this.publisherStore.get("getState").finalFigure.cubes) {
+        for(const cube of this.publisherStore.get("getFinalFigure").cubes) {
             const cube3D = this.createCube({
-                position: vectorPlusVector(cube.position, this.publisherStore.get("getState").finalFigure.position),
+                position: vectorPlusVector(cube.position, this.publisherStore.get("getFinalFigure").position),
                 color: cube.color
             }, true);
             cube3D.enableEdgesRendering();
-            cube3D.edgesWidth = 2;
-            cube3D.edgesColor = new BABYLON.Color4(...[255, 255, 255, 0.4]);
+            cube3D.edgesWidth = FINAL_FIGURE_WIDTH;
+            cube3D.edgesColor = new BABYLON.Color4(...FINAL_FIGURE_COLOR);
             finalFigureScene.push(cube3D);
         }
         return finalFigureScene;
@@ -273,7 +273,7 @@ export class World3d {
 
     private createHeapFromState(): BABYLON.Mesh[] {
         const heapScene: BABYLON.Mesh[] = [];
-        for(const cube of this.publisherStore.get("getState").heap) {
+        for(const cube of this.publisherStore.get("getHeap")) {
             const cube3D = this.createCube(cube);
             cube3D.enableEdgesRendering();
             cube3D.edgesWidth = CUBES_BORDER_WIDTH;
@@ -292,7 +292,7 @@ export class World3d {
 
     private createMaterials(): IMaterials {
         const materials: IMaterials = {};
-        this.publisherStore.get("getState").colors.forEach((color: string) => {
+        this.publisherStore.get("getColors").forEach((color: string) => {
             materials[color] = this.createMaterial(color);
             materials["T" + color] = this.createMaterial(color, true);
         })
