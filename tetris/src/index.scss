@@ -1,0 +1,14 @@
+@import "src/style/variables.scss";
+@import "./src/style/fonts.scss";
+
+* {
+  color: $color-text;
+  font-family: $font-family-base !important;
+  font-weight: $font-weight;
+  font-size: $font-size-base;
+  overscroll-behavior: none;
+}
+
+body {
+  overscroll-behavior: none;
+}

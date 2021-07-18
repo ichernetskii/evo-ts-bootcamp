@@ -1,0 +1,43 @@
+// Fonts
+
+$font-family-base:              "GothamPro", arial, sans-serif;
+
+$font-weight-thin:              100;
+$font-weight-extra-light:       200;
+$font-weight-light:             300;
+$font-weight-regular:           400;
+$font-weight-medium:            500;
+$font-weight-semi-bold:         600;
+$font-weight-bold:              700;
+$font-weight-extra-bold:        800;
+$font-weight-black:             900;
+$font-weight:                   $font-weight-regular;
+
+$font-size-base:                1rem;
+$font-size-large:               1.25 * $font-size-base;
+$font-size-small:               0.8  * $font-size-base;
+$font-size-logo:                0.75 * $font-size-base;
+$font-size-phone:               1.2  * $font-size-base;
+
+// Font headers size
+
+$font-size-h1-xlarge:           3.6  * $font-size-base; // ~58px
+$font-size-h1-large:            2.9  * $font-size-base; //  48px
+$font-size-h1:                  2.23 * $font-size-base; // ~36px
+$font-size-h2:                  1.87 * $font-size-base; // ~30px
+$font-size-h3:                  1.6  * $font-size-base; // ~26px
+$font-size-h4:                  1.25 * $font-size-base; //  20px
+$font-size-h5:                  1    * $font-size-base; //  16px
+$font-size-h6:                  0.85 * $font-size-base; // ~14px
+$font-size-h6-small:            0.75 * $font-size-base; // ~14px
+
+// Colors
+
+$color-accent:                  #FF6400;
+$color-accent-2:                #2396FF;
+$color-text:                    #FFF;
+$color-text-selection:          transparentize($color-accent, 0.35);
+$color-bg:                      #F9F9F9;
+$color-text-unactive:           #888;
+$color-error:                   #F44;
+

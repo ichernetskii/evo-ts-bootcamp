@@ -1,0 +1,83 @@
+/*Прописываем массив нужных размеров*/
+$screens: (all, 2560, 1920, 1680, 1200, 780, 320);
+// xxl "all"     : 2561-...
+//  xl "max 2560": 1921-2560
+//   l "max 1920": 1681-1920
+//   m "max 1680": 1201-1680
+//   s "max 1200":  781-1200
+//  xs "max 780" :  321-780
+// xxs "max 320" :    0-320
+
+@mixin media-styles($media) {
+  /*
+  usage:
+  @include media-styles("m") {
+    left: percentage(462px / $main-width);
+  }
+  */
+
+  // <320
+  @if $media == "xxs" {
+    @media only screen and (max-width: #{nth($screens, 7)}px) {
+      @content;
+    }
+  }
+
+  // 321 - 780
+  @if $media == "xs" {
+    @media only screen and (max-width: #{nth($screens, 6)}px) {
+      @content;
+    }
+  }
+
+  // 781 - 1200
+  @if $media == "s" {
+    @media only screen and (max-width: #{nth($screens, 5)}px) {
+      @content;
+    }
+  }
+
+  // 1201 - 1680
+  @if $media == "m" {
+    @media only screen and (max-width: #{nth($screens, 4)}px) {
+      @content;
+    }
+  }
+
+  // 1681 - 1920
+  @if $media == "l" {
+    @media only screen and (max-width: #{nth($screens, 3)}px) {
+      @content;
+    }
+  }
+
+  // 1921 - 2560
+  @if $media == "xl" {
+    @media only screen and (max-width: #{nth($screens, 2)}px) {
+      @content;
+    }
+  }
+
+  // >2560
+  @if $media == "xxl" {
+    @content;
+  }
+}
+
+@mixin media($property, $values){
+  /*разбиваем введенные значения в цикле*/
+  @for $i from 1 through length($values) {
+    /*Проверяем, если значение прописано как '' тогда пропускаем его*/
+    @if nth($values, $i) != ''{
+      @if nth($screens, $i) == 'all'{
+        /*Если это первое значение, тогда значение пропишется без @media screen */
+        #{$property}: unquote(#{nth($values, $i)});
+      } @else {
+        /*иначе помещаем свойство в @media screen с соответствующим индексом*/
+        @media screen and (max-width: nth($screens, $i) + 'px') {
+          #{$property}: unquote(#{nth($values, $i)});
+        }
+      }
+    }
+  }
+}

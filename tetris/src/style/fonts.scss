@@ -1,0 +1,70 @@
+$fonts-path: "style/fonts/";
+$fonts:(
+        "GothamPro": (
+                "weights": (
+                        "Regular" : 400,
+                        "Bold"    : 700
+                ),
+                "formats": (
+                        "woff", "ttf", "eot"
+                )
+        ));
+
+@each $font in $fonts {
+  $font-name: nth($font, 1);
+  $font-weights: map-get(nth($font, 2), "weights");
+  $font-formats: map-get(nth($font, 2), "formats");
+
+  @each $font-weight in $font-weights {
+    $font-weight-name: nth($font-weight, 1);
+    $font-weight-number: nth($font-weight, 2);
+
+    @font-face {
+      font-family: $font-name;
+
+      @if index($font-formats, "eot") != null {
+        /* IE9 Compat Modes */
+        src: url("#{$fonts-path + $font-name}/#{$font-weight-name}/#{$font-name}_#{$font-weight-name}.eot");
+      }
+
+      $srcString: "";
+      @each $font-format in $font-formats {
+        $format: "";
+        $appendix: "";
+
+        @if $font-format == "woff2" {
+          /* Super Modern Browsers */
+          $format: " format(\"woff2\")";
+        }
+
+        @if $font-format == "woff" {
+          /* Modern Browsers */
+          $format: " format(\"woff\")";
+        }
+
+        @if $font-format == "ttf" {
+          /* Old Safari, Android, iOS */
+          $format: " format(\"truetype\")";
+        }
+
+        @if $font-format == "svg" {
+          /* Legacy Safari, Android, iOS */
+          $format: " format(\"svg\")";
+          $appendix: "#" + $font-name;
+        }
+
+        @if $font-format == "eot" {
+          /* IE6-IE8 */
+          $format: " format(\"embedded-opentype\")";
+          $appendix: "?#iefix";
+        }
+        $separator: if(index($font-formats, $font-format) == 1, "", unquote(", "));
+        $srcString: $srcString + $separator + url("#{$fonts-path + $font-name}/#{$font-weight-name}/#{$font-name}_#{$font-weight-name}.#{$font-format}#{$appendix}") + $format;
+      }
+      src: unquote($srcString);
+      font-weight: map-get($font-weights, $font-weight-name);
+      font-style: normal;
+      font-display: swap;
+    }
+  }
+}

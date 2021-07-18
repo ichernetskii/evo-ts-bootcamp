@@ -5,7 +5,7 @@
 You have a life to create! Conway's life on typescript :)
 Study the rules of life on [wikipedia](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life). The basics are in these lines:
 
-> The universe of the Game of Life is an infinite, two-dimensional orthogonal grid of square cells, each of which is in one of two possible states, live or dead, (or populated and unpopulated, respectively). Every cell interacts with its eight neighbours, which are the cells that are horizontally, vertically, or diagonally adjacent. At each step in time, the following transitions occur:
+> The universe of the GameStore of Life is an infinite, two-dimensional orthogonal grid of square cells, each of which is in one of two possible states, live or dead, (or populated and unpopulated, respectively). Every cell interacts with its eight neighbours, which are the cells that are horizontally, vertically, or diagonally adjacent. At each step in time, the following transitions occur:
 
 > 1. Any live cell with fewer than two live neighbours dies, as if by underpopulation.
 > 1. Any live cell with two or three live neighbours lives on to the next generation.

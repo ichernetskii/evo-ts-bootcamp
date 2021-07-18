@@ -1,0 +1,200 @@
+@import "src/style/variables.scss";
+
+$bgColor: #33334C;
+
+body {
+  margin: 0;
+  background-color: $bgColor;
+}
+
+.app {
+  width: 100vw;
+  height: 100%;
+  position: absolute;
+  text-align: center;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+
+  & * {
+    user-select: none;
+  }
+}
+
+.toolbox {
+  margin-top: 15px;
+  position: absolute;
+  color: #FFF;
+  width: 90%;
+
+  &__block {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__info {
+    display: flex;
+    align-items: center;
+  }
+
+  &__score {
+    margin-right: 20px;
+  }
+
+  &__figure {
+    margin-left: 20px;
+    width: 100px;
+  }
+
+  &__settings {
+    width: 45px;
+    height: 45px;
+    cursor: pointer;
+    transition: transform 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    &:hover {
+      transform: rotateZ(120deg);
+    }
+  }
+
+  @media screen and (max-width: 430px) {
+    &__score {
+      margin-right: 5px;
+    }
+
+    &__figure {
+      margin-left: 5px;
+    }
+  }
+}
+
+canvas {
+  padding-top: 30px;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.buttons {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 30px 0;
+  justify-content: space-evenly;
+  display: none;
+  user-select: none;
+
+  @media (hover: none) {
+    display: flex;
+  }
+}
+
+.button {
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  border: 0;
+  padding: 3px;
+  user-select: none;
+  border-radius: 6px;
+
+  &_x {
+    background-color: #73cece;
+    box-shadow:
+            0 0 5px rgba(129, 129, 132, 0.25),
+            inset 1px 1px 3px 1px rgba(255, 255, 255, 0.85),
+            inset -2px -2px 3px rgba(25, 100, 116);
+  }
+
+  &_y {
+    background-color: #D4ACC9;
+    box-shadow:
+            0 0 5px rgba(129, 129, 132, 0.25),
+            inset 1px 1px 3px 1px rgba(255, 255, 255, 0.85),
+            inset -2px -2px 3px rgba(152, 61, 105);
+  }
+
+  &_z {
+    background-color: #F08F66;
+    box-shadow:
+            0 0 5px rgba(129, 129, 132, 0.25),
+            inset 1px 1px 3px 1px rgba(255, 255, 255, 0.85),
+            inset -2px -2px 3px rgba(163, 75, 47);
+  }
+
+  &:active {
+    box-shadow: none;
+  }
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.btnPlay {
+  $btnPlay-width: 45px;
+  $btnPlay-height: 45px;
+  width: $btnPlay-width;
+  height: $btnPlay-height;
+  display: block;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+
+  &__left {
+    height: 100%;
+    float: left;
+    background-color: #fff;
+    width: 36%;
+    transition: all 0.25s ease;
+    overflow: hidden;
+  }
+  &__triangle1 {
+    transform: translate(0, -100%);
+  }
+  &__triangle2 {
+    transform: translate(0, 100%);
+  }
+  &__triangle1,
+  &__triangle2 {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: transparent;
+    width: 0;
+    height: 0;
+    border-right: $btnPlay-width solid $bgColor;
+    border-top: 0.5 * $btnPlay-height solid transparent;
+    border-bottom: 0.5 * $btnPlay-height solid transparent;
+    transition: transform 0.25s ease;
+  }
+  &__right {
+    height: 100%;
+    float: right;
+    width: 36%;
+    background-color: #fff;
+    transition: all 0.25s ease;
+  }
+
+  &_paused {
+    .btnPlay__left {
+      width: 50%;
+    }
+    .btnPlay__right {
+      width: 50%;
+    }
+    .btnPlay__triangle1 {
+      transform: translate(0, -50%);
+    }
+    .btnPlay__triangle2 {
+      transform: translate(0, 50%);
+    }
+  }
+}
