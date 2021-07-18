@@ -1,5 +1,9 @@
 # TypeScript Bootcamp
 
+## Tetris 3D game
+
+Game live: [https://tetris3d.netlify.app](https://tetris3d.netlify.app)
+
 ## Hexagon 2048 game
 
 Game live: [hexagon2048.netlify.app](http://hexagon2048.netlify.app)<br/>
