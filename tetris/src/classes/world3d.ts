@@ -6,7 +6,6 @@ import {IGameState} from "./game-state";
 import {IListenersStore} from "./listeners.store";
 import {IListeners3D} from "./listeners.3D";
 import {throttle} from "../assets/utils";
-import {log} from "../../../lessons/14-network/007-react-keyboard/src/services/api";
 
 const GAMEFIELD_WIDTH = 4.0;
 const GAMEFIELD_COLOR = [255, 255, 255, 0.2];
