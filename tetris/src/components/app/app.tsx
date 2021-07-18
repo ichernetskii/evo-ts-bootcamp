@@ -74,6 +74,14 @@ const App: React.FC = observer(() => {
         return SVGFigures[type];
     }
 
+    function rotate(axis: Axis) {
+        if (publisherStore.get("getState").gameState === IGameState.Playing) {
+            publisherStore.dispatch("rotateFigure")(axis, 90);
+        }
+    }
+    const nextFigureColor = publisherStore.get("getState").nextFigure.color;
+    const nextFigureType = publisherStore.get("getState").nextFigure.type;
+    const nextFigure = getSVGFigure(nextFigureType, nextFigureColor);
 
     useLayoutEffect(() => {
         if (canvasRef.current) {
@@ -86,6 +94,8 @@ const App: React.FC = observer(() => {
 
     const handlers = useSwipeable({
         onSwiped: (eventData) => {
+            console.log("onSwipe", eventData);
+
             enum Directions {
                 Up = "Up",
                 Down = "Down",
@@ -112,15 +122,6 @@ const App: React.FC = observer(() => {
         },
         delta: 30
     });
-
-    function rotate(axis: Axis) {
-        if (publisherStore.get("getState").gameState === IGameState.Playing) {
-            publisherStore.dispatch("rotateFigure")(axis, 90);
-        }
-    }
-    const nextFigureColor = publisherStore.get("getState").nextFigure.color;
-    const nextFigureType = publisherStore.get("getState").nextFigure.type;
-    const nextFigure = getSVGFigure(nextFigureType, nextFigureColor);
 
     const onKeyDownHandler = (e: React.KeyboardEvent): void => {
         if (publisherStore.get("getState").gameState === IGameState.Playing) {
@@ -182,6 +183,16 @@ const App: React.FC = observer(() => {
         }
     }
 
+    const onTouchStartHandler = (e: React.TouchEvent) => {
+        if (e.touches.length >= 2) {
+            publisherStore.dispatch("setDelay")(publisherStore.get("getState").delay.fast);
+        }
+    }
+
+    const onTouchEndHandler = () => {
+        publisherStore.dispatch("setDelay")(publisherStore.get("getState").delay.normal);
+    }
+
     const onOptionsClick = () => {
         appStore.popupVisibleToggle();
         publisherStore.dispatch("gameStatePause")();
@@ -193,6 +204,8 @@ const App: React.FC = observer(() => {
             {...handlers}
             onKeyDown={onKeyDownHandler}
             onKeyUp={onKeyUpHandler}
+            onTouchStart={onTouchStartHandler}
+            onTouchEnd={onTouchEndHandler}
             tabIndex={-1}
         >
             <FormCta />
