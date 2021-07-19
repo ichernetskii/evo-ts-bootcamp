@@ -5,6 +5,7 @@ import {ICube} from "../classes/cube";
 import {colors, figures} from "./figures";
 import {IGameState} from "../classes/game-state";
 import {randomIntFromInterval} from "../assets/utils";
+import {Heap} from "../classes/heap";
 
 class GameStore {
 	readonly colors: string[] = colors;
@@ -206,19 +207,9 @@ class GameStore {
 	}
 
 	deleteLevel(level: number) {
-		const heap: ICube[] = [];
-
-		this.heap
-			.forEach(heapCube => {
-				if (heapCube.position[1] > level) {
-					const cube: ICube = {...heapCube, position: [...heapCube.position]};
-					cube.position[1] = cube.position[1] - 1;
-					heap.push(cube);
-				}
-				if (heapCube.position[1] < level) heap.push(heapCube);
-			});
-
-		this.heap = heap;
+		const heap = new Heap(this.heap);
+		heap.deleteLevel(level);
+		this.heap = heap.cubes;
 	}
 
 	deleteLevels(): void {

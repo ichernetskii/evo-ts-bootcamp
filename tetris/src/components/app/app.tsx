@@ -1,17 +1,17 @@
 import * as React from "react";
 import {useLayoutEffect} from "react";
 import {observer} from "mobx-react-lite";
+import {useSwipeable} from "react-swipeable";
 import FormCta from "../form-cta/form-cta";
 import {useStore} from "../../store/store";
 import {World3d} from "../../classes/world3d";
 import {Publisher} from "../../classes/observer";
 import useMobX from "../../classes/observer.MobX";
 import {IGameState} from "../../classes/game-state";
-import {Axis} from "../../classes/math";
-import {useSwipeable} from "react-swipeable";
-import s from  "./app.module.scss";
-import cn from "classnames";
+import {Axis, signThreshold} from "../../classes/math";
 import {IListenersStore} from "../../classes/listeners.store";
+import cn from "classnames";
+import s from  "./app.module.scss";
 
 enum KeyboardKeys {
     Space = 32,
@@ -27,14 +27,11 @@ enum KeyboardKeys {
     W = 87
 }
 
-function sign(alpha: number): number {
-    const cosAlpha = Math.cos(alpha);
-    const sqrt = Math.sqrt(2)/2;
-
-    if (-cosAlpha >= sqrt) { return 1 }
-    else {
-        if (-cosAlpha <= -sqrt) { return -1 } else { return 0 }
-    }
+enum Direction {
+    Up = "Up",
+    Down = "Down",
+    Left = "Left",
+    Right = "Right"
 }
 
 const App: React.FC = observer(() => {
@@ -43,8 +40,6 @@ const App: React.FC = observer(() => {
     const world3d = React.useRef<World3d | null>(null);
     const appStore = useStore("appStore");
     const publisherStore = new Publisher<IListenersStore>(storeConfig);
-    const signAlpha = () => sign(publisherStore.get("getCamera").alpha * (Math.PI / 180));
-    const signAlphaPlusPI = () =>  sign((publisherStore.get("getCamera").alpha + 90) * (Math.PI / 180));
     function getSVGFigure(type: number, color: string) {
         const SVGFigures = [
             <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -106,32 +101,45 @@ const App: React.FC = observer(() => {
         }
     }, []);
 
-    const handlers = useSwipeable({
-        onSwiped: (eventData) => {
-            enum Directions {
-                Up = "Up",
-                Down = "Down",
-                Left = "Left",
-                Right = "Right"
-            }
+    const dispatchMoveFigure = (direction: Direction): void => {
+        const sin = signThreshold(publisherStore.get("getCamera").alpha, "sin");
+        const cos = signThreshold(publisherStore.get("getCamera").alpha, "cos");
 
+        switch (direction) {
+            case Direction.Up:
+                publisherStore.dispatch("moveFigure")(Axis.X, -cos);
+                publisherStore.dispatch("moveFigure")(Axis.Z, sin);
+                break;
+            case Direction.Down:
+                publisherStore.dispatch("moveFigure")(Axis.X, cos);
+                publisherStore.dispatch("moveFigure")(Axis.Z, -sin);
+                break;
+            case Direction.Right:
+                publisherStore.dispatch("moveFigure")(Axis.X, sin);
+                publisherStore.dispatch("moveFigure")(Axis.Z, cos);
+                break;
+            case Direction.Left:
+                publisherStore.dispatch("moveFigure")(Axis.X, -sin);
+                publisherStore.dispatch("moveFigure")(Axis.Z, -cos);
+                break;
+        }
+    }
+
+    const onSwipeHandlers = useSwipeable({
+        onSwiped: (eventData) => {
             if (publisherStore.get("getGameState") === IGameState.Playing) {
                 switch (eventData.dir) {
-                    case Directions.Up:
-                        publisherStore.dispatch("moveFigure")(Axis.X, signAlpha());
-                        publisherStore.dispatch("moveFigure")(Axis.Z, -1*signAlphaPlusPI());
+                    case Direction.Up:
+                        dispatchMoveFigure(Direction.Up);
                         break;
-                    case Directions.Down:
-                        publisherStore.dispatch("moveFigure")(Axis.X, -1*signAlpha());
-                        publisherStore.dispatch("moveFigure")(Axis.Z, signAlphaPlusPI());
+                    case Direction.Down:
+                        dispatchMoveFigure(Direction.Down);
                         break;
-                    case Directions.Right:
-                        publisherStore.dispatch("moveFigure")(Axis.X, -1 * signAlphaPlusPI());
-                        publisherStore.dispatch("moveFigure")(Axis.Z, -1 * signAlpha());
+                    case Direction.Right:
+                        dispatchMoveFigure(Direction.Right);
                         break;
-                    case Directions.Left:
-                        publisherStore.dispatch("moveFigure")(Axis.X, signAlphaPlusPI());
-                        publisherStore.dispatch("moveFigure")(Axis.Z, signAlpha());
+                    case Direction.Left:
+                        dispatchMoveFigure(Direction.Left);
                         break;
                 }
             }
@@ -140,31 +148,22 @@ const App: React.FC = observer(() => {
     });
 
     const onKeyDownHandler = (e: React.KeyboardEvent): void => {
-        if (e.keyCode === KeyboardKeys.Q) {
-            console.log("alpha", publisherStore.get("getCamera").alpha);
-            console.log("beta", publisherStore.get("getCamera").beta);
-        }
-
         if (publisherStore.get("getGameState") === IGameState.Playing) {
             switch (e.keyCode) {
                 case KeyboardKeys.Up:
-                    publisherStore.dispatch("moveFigure")(Axis.X, signAlpha());
-                    publisherStore.dispatch("moveFigure")(Axis.Z, -1*signAlphaPlusPI());
+                    dispatchMoveFigure(Direction.Up);
                     break;
                 // down
                 case KeyboardKeys.Down:
-                    publisherStore.dispatch("moveFigure")(Axis.X, -1*signAlpha());
-                    publisherStore.dispatch("moveFigure")(Axis.Z, signAlphaPlusPI());
+                    dispatchMoveFigure(Direction.Down);
                     break;
                 // right
                 case KeyboardKeys.Right:
-                    publisherStore.dispatch("moveFigure")(Axis.X, -1 * signAlphaPlusPI());
-                    publisherStore.dispatch("moveFigure")(Axis.Z, -1 * signAlpha());
+                    dispatchMoveFigure(Direction.Right);
                     break;
                 // left
                 case KeyboardKeys.Left:
-                    publisherStore.dispatch("moveFigure")(Axis.X, signAlphaPlusPI());
-                    publisherStore.dispatch("moveFigure")(Axis.Z, signAlpha());
+                    dispatchMoveFigure(Direction.Left);
                     break;
                 // space
                 case KeyboardKeys.Space:
@@ -214,7 +213,7 @@ const App: React.FC = observer(() => {
     return (
         <div
             className={s.app}
-            {...handlers}
+            {...onSwipeHandlers}
             onKeyDown={onKeyDownHandler}
             onKeyUp={onKeyUpHandler}
             onTouchStart={onTouchStartHandler}

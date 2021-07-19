@@ -77,3 +77,19 @@ export function vectorRotate(vector: Vector, axis: Axis, angle: number): Vector 
 
     return matrixMultiplyVector(rotationMatrix, vector);
 }
+
+/**
+ * Returns 1 if fn ≥ √2/2, -1 if fn ≤ -√2/2 and 0 otherwise.
+ *
+ * @param {number} alpha Angle in degrees
+ * @param {"sin" | "cos"} fn cos or -sin
+ */
+export function signThreshold(alpha: number, fn: "sin" | "cos"): number {
+    const fnAlpha = (fn === "sin" ? -1 : 1) * Math[fn](alpha * (Math.PI / 180));
+    const sqrt = Math.sqrt(2)/2;
+
+    if (fnAlpha >= sqrt) { return 1 }
+    else {
+        if (fnAlpha <= -sqrt) { return -1 } else { return 0 }
+    }
+}
