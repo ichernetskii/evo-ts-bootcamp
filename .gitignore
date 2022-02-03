@@ -3,3 +3,4 @@
 /homeworks/**/coverage/
 /homeworks/**/build/
 node_modules
+.idea
